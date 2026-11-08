@@ -27,7 +27,7 @@ export type Color = [number, number, number];
  */
 export function lerpColor(c0: Color, c1: Color, t: number): Color {
     // PS1 problem 2(e): implement by calling lerp, assuming your lerpWeak spec
-    return [lerp(c0[0], c1[0], t), lerp(c0[1], c1[1], t), lerp(c0[2], c1[2], t)];
+    return [Math.round(lerp(c0[0], c1[0], t)), Math.round(lerp(c0[1], c1[1], t)), Math.round(lerp(c0[2], c1[2], t))];
 }
 
 /**
@@ -135,5 +135,8 @@ export function interpolate(v0: number, v1: number, easing: (ti: number) => numb
     //   -because the lerpWeak guarantees that output is between v0 and v1 and also the precondition is telling that the v0 is when t=0 and that is wrong same for v1
     //
     // PS1 problem 5(h): implement by calling lerp, which now guarantees your lerpStrong spec
-    throw new Error('not implemented yet');
+    if(t<0 || t>1) {
+        throw new Error("t must be between 0 and 1");
+    }
+    return lerp(v0,v1,easing(t));
 }
