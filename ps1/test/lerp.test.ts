@@ -66,7 +66,7 @@ describe('lerpStrong', function () {
      *   covers easing(t*t), v0<v1
      *   (0, 10, 0.5^2) -> 2.5 rounded to 3
      *   covers easing(1/t), v0=v1
-     *   (4,4, 1/2) -> 2
+     *   (4,4, 1/2) -> 4
      *   covers easing(t), v0>v1
      *   (10,0, 0.26) -> 7.4 rounded to 7 
      */
@@ -76,7 +76,7 @@ describe('lerpStrong', function () {
         assert.strictEqual(lerpStrong(0,10,0.5**2), 3);
     });
     it('lerpStrong cover v0=v1 and no rounding',function(){
-        assert.strictEqual(lerpStrong(4,4,0.5), 2);
+        assert.strictEqual(lerpStrong(4,4,0.5), 4);
     });
     it('lerpStrong cover v0>v1 and rounding down from 7.4 to 7',function(){
         assert.strictEqual(lerpStrong(10,0,0.26), 7);
