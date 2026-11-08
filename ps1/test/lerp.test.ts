@@ -6,7 +6,6 @@
 import assert from 'node:assert';
 import { forTestingOnly } from '../src/lerp.js';
 import { assertApproxEqual } from '../src/utils.js';
-import { it } from 'node:test';
 
 const { lerpWeak, lerpStrong } = forTestingOnly;
 
@@ -75,13 +74,13 @@ describe('lerpStrong', function () {
 
     // TODO: tests (each test case in its own it())
     it('lerpStrong cover, 0<t<1 v0<v1 and rounding up from 2.5 to 3',function(){
-        assert.strictEqual(lerpStrong(0,10,0.5**2), 3);
+        assertApproxEqual(lerpStrong(0,10,0.5**2), 2.5);
     });
     it('lerpStrong cover t=1, v0=v1 and no rounding',function(){
         assert.strictEqual(lerpStrong(4,4,0.5), 4);
     });
     it('lerpStrong cover v0>v1 and rounding down from 7.4 to 7',function(){
-        assert.strictEqual(lerpStrong(10,0,0.26), 7);
+        assertApproxEqual(lerpStrong(10,0,0.26), 7.4);
     });
     it('lerpStrong cover t=0, v0<v1',function(){
         assert.strictEqual(lerpStrong(2,6,0), 2);

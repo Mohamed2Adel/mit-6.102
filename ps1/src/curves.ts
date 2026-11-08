@@ -26,9 +26,9 @@ export type Point = { x: number, y: number };
 /**
  * TODO: you determine the detailed spec, which must be stronger than what is provided
  *
- * @param controlPoints TODO
- * @param renameMe TODO
- * @returns TODO
+ * @param controlPoints TODO: array of non-empty points
+ * @param t TODO: interpolation factor 0<=t<=1 
+ * @returns TODO: a point that is interpolation between input points 
  * @throws Error if and only if controlPoints is empty
  */
 export function bezierInterpolate(controlPoints: Array<Point>, renameMe: 0): Point {
