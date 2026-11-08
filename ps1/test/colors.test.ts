@@ -62,6 +62,16 @@ describe('fillGradient', function () {
      *
      * Testing strategy for fillGradient:
      *   TODO: partitions
+     *   partition on no distance between keys
+     *   partition on only one distance between keys "1 gap"
+     *   partition on multiple distances between keys "2 gap" and "3 gap"
+     *   spec example covers only one distance and "2 gap" distance
+     *   covers spec example
+     *   [[0,[0, 0, 252]],[3,[0, 126, 0]],[5,[254, 0, 0]]]
+     *   covers no gap
+     *   [[0,[0, 0, 128]],[1,[0, 128, 0]],[2,[128, 0, 0]]]
+     *   covers "3 gap" distance
+     *   [[0,[0, 0, 128]],[1,[0, 128, 0]],[5,[255, 0, 0]]]
      */
 
     it('fillGradient covers the spec example', function () {
@@ -74,7 +84,22 @@ describe('fillGradient', function () {
             [3, [0, 126, 0]], [4, [127, 63, 0]], [5, [254, 0, 0]],
         ]));
     });
-});
+    it('fillGradient covers no distance between keys', function () {
+        const colors: Map<number, Color> = new Map(
+            [[0,[0, 0, 128]],[1,[0, 128, 0]],[2,[128, 0, 0]]]
+        ); 
+        assert.strictEqual(fillGradient(colors), 0);
+    });
+    it('fillGradient covers "3 gap" distance between keys', function () {
+        const colors: Map<number, Color> = new Map(
+            [[0,[0, 0, 128]],[1,[0, 128, 0]],[5,[255, 0, 0]]]
+        );
+        assert.strictEqual(fillGradient(colors),3);
+        assert.deepStrictEqual(colors, new Map<number, Color>(
+            [[0,[0, 0, 128]],[1,[0, 128, 0]],[2,[64, 96, 0]],
+            [3,[128, 32, 0]],[4,[192, 16, 0]],[5,[255, 0, 0]]]
+        ));
+    });
 
 describe('makePalette', function () {
     /*
