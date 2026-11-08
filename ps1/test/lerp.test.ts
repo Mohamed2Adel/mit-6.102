@@ -60,25 +60,30 @@ describe('lerpStrong', function () {
      *
      * Testing strategy for lerpStrong:
      *   TODO: partitions
-     *   partition on easing = t*t, 1/t, cos(2*pi*t), t
+     *   partition on t: t=0, t=1, 0<t<1
      *   partition on v0 vs v1: v0 = v1, v0 < v1, v0 > v1.
      * 
-     *   covers easing(t*t), v0<v1
+     *   covers 0<t<1, v0<v1
      *   (0, 10, 0.5^2) -> 2.5 rounded to 3
-     *   covers easing(1/t), v0=v1
-     *   (4,4, 1/2) -> 4
-     *   covers easing(t), v0>v1
+     *   covers t=1, v0=v1
+     *   (4,4, 1) -> 4
+     *   covers 0<t<1, v0>v1
      *   (10,0, 0.26) -> 7.4 rounded to 7 
+     *   covers t=0, v0<v1
+     *   (2, 6, 0) -> 2
      */
 
     // TODO: tests (each test case in its own it())
-    it('lerpStrong cover v0<v1 and rounding up from 2.5 to 3',function(){
+    it('lerpStrong cover, 0<t<1 v0<v1 and rounding up from 2.5 to 3',function(){
         assert.strictEqual(lerpStrong(0,10,0.5**2), 3);
     });
-    it('lerpStrong cover v0=v1 and no rounding',function(){
+    it('lerpStrong cover t=1, v0=v1 and no rounding',function(){
         assert.strictEqual(lerpStrong(4,4,0.5), 4);
     });
     it('lerpStrong cover v0>v1 and rounding down from 7.4 to 7',function(){
         assert.strictEqual(lerpStrong(10,0,0.26), 7);
+    });
+    it('lerpStrong cover t=0, v0<v1',function(){
+        assert.strictEqual(lerpStrong(2,6,0), 2);
     });
 });
