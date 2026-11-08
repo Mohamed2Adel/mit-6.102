@@ -100,6 +100,7 @@ describe('fillGradient', function () {
             [3,[128, 32, 0]],[4,[192, 16, 0]],[5,[255, 0, 0]]]
         ));
     });
+});
 
 describe('makePalette', function () {
     /*
