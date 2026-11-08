@@ -132,6 +132,7 @@ export function makePalette(color: Color, n: number): Array<Color> {
 export function interpolate(v0: number, v1: number, easing: (ti: number) => number, t: number): number {
     // PS1 problem 5(a): replace this line with a one-sentence explanation:
     //   why can we not use lerp with your lerpWeak spec to implement interpolate(..)?
+    //   -because the lerpWeak guarantees that output is between v0 and v1 and also the precondition is telling that the v0 is when t=0 and that is wrong same for v1
     //
     // PS1 problem 5(h): implement by calling lerp, which now guarantees your lerpStrong spec
     throw new Error('not implemented yet');

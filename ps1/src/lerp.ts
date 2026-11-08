@@ -32,22 +32,24 @@ function lerpWeak(v0: number, v1: number, t: number): number {
  * PS1 problem 5(b): write a STRONG spec for lerpStrong that makes it applicable in all the
  * places you've used lerp so far, as well as for implementing interpolate(..). A useful spec!
  *
- * @param v0 TODO
- * @param v1 TODO
- * @param t TODO
- * @returns TODO
+ * @param v0 TODO the start value when easing(t)=0 
+ * @param v1 TODO the end value when easing(t)=1 
+ * @param t TODO the easing(t)
+ * @returns TODO return the v0*(1-t) + v1*t 
+ *           rounded to nearest integer
  */
 function lerpStrong(v0: number, v1: number, t: number): number {
     // PS1 problem 5(e): implement
-    throw new Error('not implemented yet');
+    // throw new Error('not implemented yet');
+    return Math.round(v0*(1-t) + v1*t);
 }
 
 /**
  * Perform linear interpolation ... TODO ...
- *
+ * 
  * PS1 problem 5(f): change this line so `lerp` uses lerpStrong instead of lerpWeak.
  */
-export const lerp = lerpWeak;
+export const lerp = lerpStrong;
 
 /**
  * PS1 instructions: both implementations are exported for PS1 testing purposes only.
@@ -61,13 +63,14 @@ export const forTestingOnly = { lerpWeak, lerpStrong };
  *
  * 1. Compare the PRECONDITIONS: is lerpStrong's precondition weaker than, stronger than,
  *    the same as, or incomparable to lerpWeak's? Why?
- *    TODO
+ *    TODO: precondition of lerpStrong is weaker than that of lerpWeak, because the bounded
+ *    value of t in the lerpWeak is removed now since easing(t) could be <0 or >1. 
  *
  * 2. Compare the POSTCONDITIONS: is lerpStrong's postcondition stronger than, weaker than,
  *    the same as, or incomparable to lerpWeak's? Why?
- *    TODO
+ *    TODO: the postcondition is the same as it return the same formula
  *
  * 3. So is the lerpStrong spec stronger than, weaker than, the same as, or incomparable to
  *    the lerpWeak spec, and could lerpStrong's implementation replace lerpWeak's everywhere?
- *    TODO
+ *    TODO: stronger and could replace lerpWeak everywhere
  */
