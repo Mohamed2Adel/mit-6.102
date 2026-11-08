@@ -179,9 +179,30 @@ describe('interpolate', function () {
      *
      * Testing strategy for interpolate:
      *   TODO: partitions
+     *   partitions on v0 vs v1: v0<v1, v0>v1, v0=v1
+     *   partitions on t: t=0, t=1, 0<t<1
+     *   partitions on easing(t): t*t, cos(2*pi*t), 1/t, t
+     *   
+     *   covered by: v0<v1, 0<t<1, t*t
+     *   (0, 1, t*t, 0.6) -> 0.36
+     *   covered by: v0>v1, t=1, t
+     *   (3, 2, t, 1) -> 2
+     *   covered by: v0=v1, 0<t<1, 1/t
+     *   (7, 7, 1/t, 0.5) -> 7
+     *   covered by: v0<v1, t=0, cos(2*pi*t)
+     *   (2, 9, cos(), 0) -> 9
      */
 
     it('interpolate covers the spec example: quadratic easing', function () {
         assertApproxEqual(interpolate(0, 1, t => t * t, 0.6), 0.36);
+    });
+    it('interpolate covers the v0>v1, t=1, t', function () {
+        assertApproxEqual(interpolate(3, 2, t => t, 1), 2);
+    });
+    it('interpolate covers the v0=v1, 0<t<1, 1/t', function () {
+        assertApproxEqual(interpolate(7, 7, t => 1/t, 0.5), 7);
+    });
+    it('interpolate covers the v0<v1, t=0, cos(2*pi*t)', function () {
+        assertApproxEqual(interpolate(2, 9, t => Math.cos(2*Math.PI*t), 0), 9);
     });
 });

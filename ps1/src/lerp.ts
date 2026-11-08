@@ -36,12 +36,12 @@ function lerpWeak(v0: number, v1: number, t: number): number {
  * @param v1 TODO the end value when easing(t)=1 
  * @param t TODO the easing(t)
  * @returns TODO return the v0*(1-t) + v1*t 
- *           rounded to nearest integer
+ *          
  */
 function lerpStrong(v0: number, v1: number, t: number): number {
     // PS1 problem 5(e): implement
     // throw new Error('not implemented yet');
-    return Math.round(v0*(1-t) + v1*t);
+    return (v0*(1-t) + v1*t);
 }
 
 /**
