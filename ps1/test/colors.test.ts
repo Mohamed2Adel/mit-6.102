@@ -108,6 +108,18 @@ describe('makePalette', function () {
      *
      * Testing strategy for makePalette:
      *   TODO: partitions
+     *   partition on n: n = 1, n = 2, n = 3
+     *   partition on color: pured red, pure green, pure blue, white, black
+     *   covers spec example (pure green, n=4)
+     *   ([0, 255, 0], 4)
+     *   covers n = 1, white 
+     *   ([255, 255, 255], 1)
+     *   covers n = 2, pure red  
+     *   ([255, 0, 0], 2)
+     *   covers n = 3, pure blue
+     *   ([0, 0, 255], 3)
+     *   covers n = 5, black 
+     *   ([0, 0, 0], 5)
      */
 
     it('makePalette covers the spec example: pure green, n=4', function () {
@@ -119,6 +131,44 @@ describe('makePalette', function () {
             [0, 255, 0],    // pure green, hue 120
             [0, 128, 255],  // dodger blue, hue 210
             [255, 0, 255],  // fuchsia, hue 300
+        ]));
+    });
+    it('makePalette covers n=1 and white', function(){
+        const palette = makePalette([255, 255, 255],1);
+        // the spec doesn't fix the order of the array, so compare as sorted lists
+        const sorted = (colors: Array<Color>): Array<Color> => [...colors].sort((a, b) => a.join(',').localeCompare(b.join(',')));
+        assert.deepStrictEqual(sorted(palette), sorted([[255,255,255]]));
+    });
+    it('makePalette covers pure red, n=2', function () {
+        const palette = makePalette([255, 0, 0], 2);
+        // the spec doesn't fix the order of the array, so compare as sorted lists
+        const sorted = (colors: Array<Color>): Array<Color> => [...colors].sort((a, b) => a.join(',').localeCompare(b.join(',')));
+        assert.deepStrictEqual(sorted(palette), sorted([
+            [255, 0, 0],    // red, hue 0 [0,255,0] 
+            [0, 255, 255],  // cyan, hue 180 [255,0,0]
+        ]));
+    });
+    it('makePalette covers pure blue, n=3 ', function () {
+        const palette = makePalette([0, 0, 255], 3);
+        // the spec doesn't fix the order of the array, so compare as sorted lists
+        const sorted = (colors: Array<Color>): Array<Color> => [...colors].sort((a, b) => a.join(',').localeCompare(b.join(',')));
+        assert.deepStrictEqual(sorted(palette), sorted([
+            [255, 0, 0],  // red, hue 0
+            [0, 255, 0], // green, hue 120 
+            [0, 0, 255], // blue, hue 240
+        ]));
+    });
+    it('makePalette covers black, n=5 ', function () {
+        const palette = makePalette([0, 0, 0], 5);
+        // the spec doesn't fix the order of the array, so compare as sorted lists
+        const sorted = (colors: Array<Color>): Array<Color> => [...colors].sort((a, b) => a.join(',').localeCompare(b.join(',')));
+        // black has lightness 0, so every hue converts to black: only ONE distinct color
+        assert.deepStrictEqual(sorted(palette), sorted([
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
         ]));
     });
 });
