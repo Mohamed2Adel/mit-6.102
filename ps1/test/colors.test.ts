@@ -97,7 +97,7 @@ describe('fillGradient', function () {
         assert.strictEqual(fillGradient(colors),3);
         assert.deepStrictEqual(colors, new Map<number, Color>(
             [[0,[0, 0, 128]],[1,[0, 128, 0]],[2,[64, 96, 0]],
-            [3,[128, 32, 0]],[4,[192, 16, 0]],[5,[255, 0, 0]]]
+            [3,[128, 64, 0]],[4,[191, 32, 0]],[5,[255, 0, 0]]]
         ));
     });
 });

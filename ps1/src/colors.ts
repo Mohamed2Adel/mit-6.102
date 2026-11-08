@@ -53,7 +53,29 @@ export function lerpColor(c0: Color, c1: Color, t: number): Color {
  */
 export function fillGradient(colors: Map<number, Color>): number {
     // PS1 problem 3(b): implement
-    throw new Error('not implemented yet');
+    // throw new Error('not implemented yet');
+
+    if(colors.size === 0) {
+        return 0;
+    }
+    else {
+        const i = [...colors.keys()].sort((a,b) => a-b);
+        for(const key of i) {
+            const prev = key;
+            const next = i[i.indexOf(key)+1];
+            if((next - prev) === 2) {
+                const t = 1/(next - prev);
+                colors.set(prev + 1, lerpColor(colors.get(prev)!, colors.get(next)!, t));
+            }
+            else if((next - prev) > 2) {
+                for(let j = 1; j < (next - prev); j++) {
+                    const t = 1/(next - prev);
+                    colors.set(prev + j, lerpColor(colors.get(prev)!, colors.get(next)!, t*j));
+                }
+            }
+    }
+    return colors.size - i.length;
+}
 }
 
 /**
