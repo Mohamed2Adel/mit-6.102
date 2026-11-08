@@ -96,7 +96,20 @@ export function fillGradient(colors: Map<number, Color>): number {
  */
 export function makePalette(color: Color, n: number): Array<Color> {
     // PS1 problem 4(b): implement (utils.hslToRgb and utils.rgbToHsl are provided)
-    throw new Error('not implemented yet');
+    // throw new Error('not implemented yet');
+    const arr: Array<Color> = [];
+    const hsl = utils.rgbToHsl(color);
+    const s = hsl[1];
+    const l = hsl[2];
+    let h = hsl[0];
+    if(n===1){return [color];}
+    else {
+        for(let i = 0; i < n; i++){
+            arr.push(utils.hslToRgb([h, s, l]));
+            h = (h + (360/n))%360;
+        }
+    }
+    return arr;
 }
 
 /**
