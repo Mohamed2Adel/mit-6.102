@@ -68,9 +68,12 @@ export const forTestingOnly = { lerpWeak, lerpStrong };
  *
  * 2. Compare the POSTCONDITIONS: is lerpStrong's postcondition stronger than, weaker than,
  *    the same as, or incomparable to lerpWeak's? Why?
- *    TODO: the postcondition is not the same as it's return is not rounded
+ *    The postconditions are incomparable: lerpWeak promises an integer (rounded) result while
+ *    lerpStrong promises the exact unrounded value, so neither guarantee implies the other.
  *
  * 3. So is the lerpStrong spec stronger than, weaker than, the same as, or incomparable to
  *    the lerpWeak spec, and could lerpStrong's implementation replace lerpWeak's everywhere?
- *    TODO: stronger and could replace lerpWeak everywhere
+ *    The specs are incomparable (weaker precondition but a different, not stronger, postcondition),
+ *    so lerpStrong cannot replace lerpWeak everywhere: callers that rely on a rounded integer,
+ *    like lerpColor, must now do the rounding themselves.
  */
