@@ -68,7 +68,7 @@ export const forTestingOnly = { lerpWeak, lerpStrong };
  *
  * 2. Compare the POSTCONDITIONS: is lerpStrong's postcondition stronger than, weaker than,
  *    the same as, or incomparable to lerpWeak's? Why?
- *    TODO: the postcondition is the same as it return the same formula
+ *    TODO: the postcondition is not the same as it's return is not rounded
  *
  * 3. So is the lerpStrong spec stronger than, weaker than, the same as, or incomparable to
  *    the lerpWeak spec, and could lerpStrong's implementation replace lerpWeak's everywhere?
