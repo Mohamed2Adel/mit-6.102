@@ -41,7 +41,8 @@ export function bezierInterpolate(controlPoints: Array<Point>, t: number): Point
         throw new Error('controlPoints must not be empty');
     }
     else if(controlPoints.length === 1) {
-        return controlPoints[0];
+        const p = controlPoints[0];
+        return { x: p.x, y: p.y };
     }
     else if(controlPoints.length === 2) {
     return {x:lerp(controlPoints[0].x, controlPoints[1].x, t), y:lerp(controlPoints[0].y, controlPoints[1].y, t)};
