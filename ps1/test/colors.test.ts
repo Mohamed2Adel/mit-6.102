@@ -165,10 +165,6 @@ describe('makePalette', function () {
         // black has lightness 0, so every hue converts to black: only ONE distinct color
         assert.deepStrictEqual(sorted(palette), sorted([
             [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
         ]));
     });
 });
@@ -191,6 +187,12 @@ describe('interpolate', function () {
      *   (7, 7, 1/t, 0.5) -> 7
      *   covered by: v0<v1, t=0, cos(2*pi*t)
      *   (2, 9, cos(), 0) -> 9
+     *
+     *   partition on t outside [0, 1] (must throw): t < 0, t > 1
+     *   covered by: t < 0
+     *   (0, 1, t, -0.5) -> throws Error
+     *   covered by: t > 1
+     *   (0, 1, t, 1.5) -> throws Error
      */
 
     it('interpolate covers the spec example: quadratic easing', function () {
@@ -204,5 +206,11 @@ describe('interpolate', function () {
     });
     it('interpolate covers the v0<v1, t=0, cos(2*pi*t)', function () {
         assertApproxEqual(interpolate(2, 9, t => Math.cos(2*Math.PI*t), 0), 9);
+    });
+    it('interpolate covers t < 0: throws', function () {
+        assert.throws(() => interpolate(0, 1, t => t, -0.5), Error);
+    });
+    it('interpolate covers t > 1: throws', function () {
+        assert.throws(() => interpolate(0, 1, t => t, 1.5), Error);
     });
 });

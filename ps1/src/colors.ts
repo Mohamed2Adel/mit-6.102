@@ -104,8 +104,16 @@ export function makePalette(color: Color, n: number): Array<Color> {
     let h = hsl[0];
     if(n===1){return [color];}
     else {
+        // different hues can convert to the same RGB color (e.g. any hue at lightness 0 is black),
+        // so remember which colors are already in arr and keep only the distinct ones
+        const seen = new Set<string>();
         for(let i = 0; i < n; i++){
-            arr.push(utils.hslToRgb([h, s, l]));
+            const rgb = utils.hslToRgb([h, s, l]);
+            const key = rgb.join(',');
+            if (!seen.has(key)) {
+                seen.add(key);
+                arr.push(rgb);
+            }
             h = (h + (360/n))%360;
         }
     }
