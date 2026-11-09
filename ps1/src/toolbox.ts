@@ -13,6 +13,7 @@
  * Replace `todo` below with your toolbox functions.
  */
 
+import { isBigUint64Array } from 'util/types';
 import { animateToFile, framerate, Animation, Frame } from '../lib/animate.js';
 import { Color, lerpColor, fillGradient, makePalette, interpolate } from './colors.js';
 import { Point, bezierInterpolate, bezierPath } from './curves.js';
@@ -26,8 +27,15 @@ import { Point, bezierInterpolate, bezierPath } from './curves.js';
  *          frameAt(i / (N − 1)), so the first frame is at t = 0 and the last frame is at t = 1
  * @throws Error if seconds × framerate is not an integer or is less than 2
  */
-export function makeAnimation(seconds:number,frameAt:(t:number)=>Frame): Animation {
-    throw new Error('not implemented yet');
+export function makeAnimation(seconds:number, frameAt:(t:number)=>Frame): Animation {    const result: Animation =[];
+    const N = seconds * framerate;
+    if(N < 2 || !Number.isInteger(N)) {
+        throw new Error('seconds must be >0, and seconds x framerate must be >=2 and integer');
+    }
+    for (let i = 0; i < N; i++) {
+        result.push(frameAt(i/(N-1)));
+    }
+    return result;
 }
 
 /**
@@ -35,6 +43,7 @@ export function makeAnimation(seconds:number,frameAt:(t:number)=>Frame): Animati
  * @param points current points
  * @param offset the offset of type point that the points will be moved with
  * @returns return a copy of points moved with offset. in same length and orders
+ *          { x: points[i].x + offset.x, y: points[i].y + offset.y }
  */
 export function translate(points: Array<Point>, offset: Point): Array<Point> {
     const result = points.map(point => ({
