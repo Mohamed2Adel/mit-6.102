@@ -42,7 +42,7 @@ describe('bezierInterpolate', function () {
     assertApproxEqual(p.x, 1);
     assertApproxEqual(p.y, 6);
     });
-    it('bezierInterpolate covers n=1 return same point', function () {
+    it('bezierInterpolate covers n=3, t=1/3', function () {
     const p = bezierInterpolate([{ x: 1, y: 2 }, { x: 3, y: 6 }, { x: 5, y: 4 }], 1/3);
     assertApproxEqual(p.x, 7/3);
     assertApproxEqual(p.y, 4);
