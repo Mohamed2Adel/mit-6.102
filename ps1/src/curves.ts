@@ -18,6 +18,8 @@
  *     since you cannot add exceptional cases
  */
 
+import { lerp } from "./lerp.js";
+
 /**
  * A point on the Cartesian plane.
  */
@@ -34,7 +36,24 @@ export type Point = { x: number, y: number };
  */
 export function bezierInterpolate(controlPoints: Array<Point>, t: number): Point {
     // PS1 problem 6(b): implement
-    throw new Error('not implemented yet');
+    //throw new Error('not implemented yet');
+    if(controlPoints.length === 0) {
+        throw new Error('controlPoints must not be empty');
+    }
+    else if(controlPoints.length === 1) {
+        return controlPoints[0];
+    }
+    else if(controlPoints.length === 2) {
+    return {x:lerp(controlPoints[0].x, controlPoints[1].x, t), y:lerp(controlPoints[0].y, controlPoints[1].y, t)};
+    }
+    else {
+        const arr: Array<Point> = [];
+        for (let i = 0; i < controlPoints.length-1; i++) {
+            const point ={x:lerp(controlPoints[i].x, controlPoints[i+1].x, t), y:lerp(controlPoints[i].y, controlPoints[i+1].y, t)};
+            arr.push(point);
+        }
+        return bezierInterpolate(arr, t);
+    }
 }
 
 /**
