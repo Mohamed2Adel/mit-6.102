@@ -101,6 +101,30 @@ export function handoutExampleTwo(): void {
     // The color of each curve is a rainbow gradient around the color wheel that starts at:
     const rainbowStart: Color = [39, 229, 220];
 
-    const frames: Animation = []; // TODO: build seconds * framerate frames using your toolbox
+    // 1-D Bézier easing: treat each control value v as the point (v, 0) and read back x
+    const revealControlPoints: Array<Point> = revealEasingControls.map(v => ({ x: v, y: 0 }));
+    const revealEasing = (t: number): number => bezierInterpolate(revealControlPoints, t).x;
+
+    // each curve is drawn with numPoints points, i.e. numPoints - 1 segments, one rainbow color each
+    const numPoints = 24;
+    const rainbow: Array<Color> = makePalette(rainbowStart, numPoints - 1);
+
+    // draw `curve` from curve-parameter 0 up to `reveal`, as short segments colored around the rainbow
+    const rainbowCurve = (curve: Array<Point>, reveal: number): Frame => {
+        const points = bezierPath(curve, s => s * reveal, numPoints);
+        const segments: Frame = [];
+        for (let j = 0; j < points.length - 1; j++) {
+            segments.push({
+                color: rainbow[j % rainbow.length],
+                points: [points[j], points[j + 1]],
+            });
+        }
+        return segments;
+    };
+
+    const frames: Animation = makeAnimation(seconds, t => {
+        const reveal = revealEasing(t);
+        return [...rainbowCurve(heartLeft, reveal), ...rainbowCurve(heartRight, reveal)];
+    });
     animateToFile(frames, 'example2.html');
 }
