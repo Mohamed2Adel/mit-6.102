@@ -69,10 +69,10 @@ export function bezierInterpolate(controlPoints: Array<Point>, t: number): Point
  * @param controlPoints Bézier curve control points P_0 through P_n, nonempty
  * @param easing function mapping input interpolation parameter ti, 0 <= ti <= 1,
  *               to an applied interpolation parameter, as constrained above
- * @param t TODO: the interpolation factor of type number|undefined
+ * @param numPoints TODO: how many points comeback, integer >=2, if undefined return default 24
  * @returns TODO: an array of points on bezier curve with length determined by t,easing(t)
  */
-export function bezierPath(controlPoints: Array<Point>, easing: (ti: number) => number, t: number|undefined): Array<Point> {
+export function bezierPath(controlPoints: Array<Point>, easing: (ti: number) => number, numPoints: number|undefined): Array<Point> {
     // PS1 problem 6(b): implement
     // throw new Error('not implemented yet');
     
