@@ -26,12 +26,13 @@ export type Point = { x: number, y: number };
 /**
  * TODO: you determine the detailed spec, which must be stronger than what is provided
  *
- * @param controlPoints TODO: array of non-empty points
+ * @param controlPoints TODO: array of points
  * @param t TODO: interpolation factor 0<=t<=1 
- * @returns TODO: a point that is interpolation between input points 
+ * @returns TODO: a point on bezier curve that is interpolation between input points, 
+ *          if t=0 return P_0 and if t=1 return P_n 
  * @throws Error if and only if controlPoints is empty
  */
-export function bezierInterpolate(controlPoints: Array<Point>, renameMe: 0): Point {
+export function bezierInterpolate(controlPoints: Array<Point>, t: number): Point {
     // PS1 problem 6(b): implement
     throw new Error('not implemented yet');
 }
@@ -48,10 +49,10 @@ export function bezierInterpolate(controlPoints: Array<Point>, renameMe: 0): Poi
  * @param controlPoints Bézier curve control points P_0 through P_n, nonempty
  * @param easing function mapping input interpolation parameter ti, 0 <= ti <= 1,
  *               to an applied interpolation parameter, as constrained above
- * @param renameMe TODO: you determine the detailed precondition, including a weaker static type
+ * @param t TODO: the interpolation factor of type number|undefined
  * @returns TODO: you determine the detailed postcondition, but you may NOT add "throws" cases
  */
-export function bezierPath(controlPoints: Array<Point>, easing: (ti: number) => number, renameMe: undefined): Array<Point> {
+export function bezierPath(controlPoints: Array<Point>, easing: (ti: number) => number, t: number|undefined): Array<Point> {
     // PS1 problem 6(b): implement
     throw new Error('not implemented yet');
 }
