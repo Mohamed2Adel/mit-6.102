@@ -76,7 +76,73 @@ describe('bezierPath', function () {
     /*
      * Testing strategy for bezierPath:
      *   TODO: partitions (the provided postcondition is TODO, so there's no example test yet)
+     *   partition on easing: linear t=>t, nonlinear t=>t*t, 
+     *   partition on numPoints: undefined, =2, >2
+     *   partition on controlPoints: n=1, n=2, n>2
+     *
+     *   (assumes the postcondition: exactly numPoints points, or 24 if undefined, where point i is
+     *    the curve point at easing(i / (numPoints - 1)) for i = 0 .. numPoints-1)
+     *
+     *   covered by: 2 control points, linear, numPoints=3
+     *   ([(0,0),(10,20)], t=>t, 3) -> (0,0), (5,10), (10,20)
+     *   covered by: 2 control points, nonlinear, numPoints=3
+     *   ([(0,0),(10,20)], t=>t*t, 3) -> (0,0), (2.5,5), (10,20)
+     *   covered by: 3 control points, nonlinear, numPoints=3
+     *   ([(1,2),(3,6),(5,4)], t=>t*t, 3) -> (1,2), (2,3.625), (5,4)
+     *   covered by: 4 control points, linear, numPoints=2
+     *   ([(0,9),(10,-6),(20,16),(30,0)], t=>t, 2) -> (0,9), (30,0)
+     *   covered by: 4 control points, nonlinear, numPoints=undefined
+     *   ([(0,9),(10,-6),(20,16),(30,0)], t=>t*t, undefined) -> 24 points, first (0,9), last (30,0)
+     *   covered by: 1 control point, linear, numPoints=4
+     *   ([(7,-3)], t=>t, 4) -> (7,-3) four times
      */
 
     // TODO: tests
+    it('bezierPath covers 2 control points, linear easing, numPoints=3', function () {
+    // a straight line from (0,0) to (10,20); evenly spaced inputs 0, 0.5, 1
+    const path = bezierPath([{ x: 0, y: 0 }, { x: 10, y: 20 }], t => t, 3);
+    assertPathApproxEqual(path,[{ x: 0, y: 0 }, { x: 5, y: 10 }, { x: 10, y: 20 }]);
+    });
+    it('bezierPath covers 2 control points, nonlinear easing, numPoints=3', function () {
+        // easing turns the inputs 0, 0.5, 1 into 0, 0.25, 1
+        const path = bezierPath([{ x: 0, y: 0 }, { x: 10, y: 20 }], t => t * t, 3);
+        assertPathApproxEqual(path, [{ x: 0, y: 0 }, { x: 2.5, y: 5 }, { x: 10, y: 20 }]);
+    });
+    it('bezierPath covers 3 control points, nonlinear easing, numPoints=3', function () {
+        // middle point is the curve at easing(0.5) = 0.25:
+        // weights (1-t)^2 = 0.5625, 2(1-t)t = 0.375, t^2 = 0.0625
+        const path = bezierPath([{ x: 1, y: 2 }, { x: 3, y: 6 }, { x: 5, y: 4 }], t => t * t, 3);
+        assertPathApproxEqual(path, [{ x: 1, y: 2 }, { x: 2, y: 3.625 }, { x: 5, y: 4 }]);
+    });
+    it('bezierPath covers 4 control points, linear easing, numPoints=2 (minimum)', function () {
+        const path = bezierPath([{ x: 0, y: 9 }, { x: 10, y: -6 }, { x: 20, y: 16 }, { x: 30, y: 0 }], t => t, 2);
+        assertPathApproxEqual(path, [{ x: 0, y: 9 }, { x: 30, y: 0 }]);
+    });
+    it('bezierPath covers 4 control points, nonlinear easing, numPoints=undefined (default 24)', function () {
+        const path = bezierPath([{ x: 0, y: 9 }, { x: 10, y: -6 }, { x: 20, y: 16 }, { x: 30, y: 0 }], t => t * t, undefined);
+        assert.strictEqual(path.length, 24);
+        assertApproxEqual(path[0].x, 0, 'first point x');
+        assertApproxEqual(path[0].y, 9, 'first point y');
+        assertApproxEqual(path[23].x, 30, 'last point x');
+        assertApproxEqual(path[23].y, 0, 'last point y');
+    });
+    it('bezierPath covers 1 control point, linear easing, numPoints=4', function () {
+        // a 1-point "curve" is that point for every t
+        const path = bezierPath([{ x: 7, y: -3 }], t => t, 4);
+        assertPathApproxEqual(path, [{ x: 7, y: -3 }, { x: 7, y: -3 }, { x: 7, y: -3 }, { x: 7, y: -3 }]);
+    });
 });
+
+/**
+ * Assert that two paths have the same length and approximately equal points, in order.
+ *
+ * @param actual path returned by the function being tested
+ * @param expected expected path
+ */
+function assertPathApproxEqual(actual: Array<Point>, expected: Array<Point>): void {
+    assert.strictEqual(actual.length, expected.length, 'path length');
+    for (let i = 0; i < expected.length; i++) {
+        assertApproxEqual(actual[i].x, expected[i].x, `point ${i} x`);
+        assertApproxEqual(actual[i].y, expected[i].y, `point ${i} y`);
+    }
+}

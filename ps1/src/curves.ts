@@ -75,5 +75,16 @@ export function bezierInterpolate(controlPoints: Array<Point>, t: number): Point
 export function bezierPath(controlPoints: Array<Point>, easing: (ti: number) => number, numPoints: number|undefined): Array<Point> {
     // PS1 problem 6(b): implement
     // throw new Error('not implemented yet');
-    
+    if(numPoints === undefined) {numPoints=24;}
+    const result: Array<Point> = [];
+    for (let i = 0; i < numPoints; i++) {
+        if(controlPoints.length === 1) {
+            result.push({x:controlPoints[0].x, y:controlPoints[0].y});
+        }
+        else {
+            result.push(bezierInterpolate(controlPoints,easing(i/(numPoints-1))));
+        }
+    }
+    return result;
 }
+
