@@ -70,13 +70,14 @@ export function handoutExampleOne(): void {
     // Its RGB color transitions linearly from:
     const startColor: Color = [128, 128, 128];
     const endColor: Color = [173, 255, 47];
- 
+
+    // compute the circle points
+    const topPoints = bezierPath(circleTop, t=>t*t, 24);       
+    const bottomPoints = bezierPath(circleBottom, t=>t*t, 24); 
 
     const frames: Animation = makeAnimation(seconds, t => {
         const offset = bezierInterpolate(translation, easing(t));
         const color = lerpColor(startColor, endColor, t);
-        const topPoints = bezierPath(circleTop, t=>t*t, 24);
-        const bottomPoints = bezierPath(circleBottom, t=>t*t, 24); 
         return [
             {color: color, points: translate(topPoints, offset)},
             {color: color, points: translate(bottomPoints, offset)}
