@@ -36,8 +36,13 @@ export function makeAnimation(seconds:number,frameAt:(t:number)=>Frame): Animati
  * @param offset the offset of type point that the points will be moved with
  * @returns return a copy of points moved with offset. in same length and orders
  */
-export function translate(points:Array<Point>, offset:Point): Array<Point> {
-    throw new Error('not implemented yet');
+export function translate(points: Array<Point>, offset: Point): Array<Point> {
+    const result = points.map(point => ({
+        x: point.x + offset.x,
+        y: point.y + offset.y
+    }));
+
+    return result;
 }
 
 /**
