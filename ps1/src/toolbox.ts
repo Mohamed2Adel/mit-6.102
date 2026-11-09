@@ -13,14 +13,30 @@
  * Replace `todo` below with your toolbox functions.
  */
 
-import { animateToFile, framerate, Animation } from '../lib/animate.js';
+import { animateToFile, framerate, Animation, Frame } from '../lib/animate.js';
 import { Color, lerpColor, fillGradient, makePalette, interpolate } from './colors.js';
 import { Point, bezierInterpolate, bezierPath } from './curves.js';
 
 /**
- * TODO
+ * Build an animation that lasts `seconds` seconds by calling frameAt once per frame, in order.
+ *
+ * @param seconds duration of the animation in seconds; seconds × framerate must be an integer >= 2
+ * @param frameAt function that, given a time t with 0 <= t <= 1, returns the frame to show at that time
+ * @returns an animation of exactly N = seconds × framerate frames, where frame i (0 <= i < N) is
+ *          frameAt(i / (N − 1)), so the first frame is at t = 0 and the last frame is at t = 1
+ * @throws Error if seconds × framerate is not an integer or is less than 2
  */
-export function todo(): void {
+export function makeAnimation(seconds:number,frameAt:(t:number)=>Frame): Animation {
+    throw new Error('not implemented yet');
+}
+
+/**
+ * a fucntion that Return a copy of points, each moved by offset.
+ * @param points current points
+ * @param offset the offset of type point that the points will be moved with
+ * @returns return a copy of points moved with offset. in same length and orders
+ */
+export function translate(points:Array<Point>, offset:Point): Array<Point> {
     throw new Error('not implemented yet');
 }
 
