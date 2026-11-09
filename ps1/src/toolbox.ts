@@ -13,7 +13,6 @@
  * Replace `todo` below with your toolbox functions.
  */
 
-import { isBigUint64Array } from 'util/types';
 import { animateToFile, framerate, Animation, Frame } from '../lib/animate.js';
 import { Color, lerpColor, fillGradient, makePalette, interpolate } from './colors.js';
 import { Point, bezierInterpolate, bezierPath } from './curves.js';
@@ -72,8 +71,8 @@ export function handoutExampleOne(): void {
     const endColor: Color = [173, 255, 47];
 
     // compute the circle points
-    const topPoints = bezierPath(circleTop, t=>t*t, 24);       
-    const bottomPoints = bezierPath(circleBottom, t=>t*t, 24); 
+    const topPoints = bezierPath(circleTop, t=>t, 24);       
+    const bottomPoints = bezierPath(circleBottom, t=>t, 24); 
 
     const frames: Animation = makeAnimation(seconds, t => {
         const offset = bezierInterpolate(translation, easing(t));
