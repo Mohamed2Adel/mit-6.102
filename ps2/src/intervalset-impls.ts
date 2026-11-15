@@ -18,13 +18,13 @@ export class RepMapIntervalSet<Label> implements IntervalSet<Label> {
     private readonly endMap: Map<bigint, bigint> = new Map();
 
     // Abstraction function:
-    //   AF(Map<string, bigint>, Map<bigint, bigint>) = the interval set: 
-    //            a string label interval set with one interval [x,y) with label z
+    //   AF(Map<Label, bigint>, Map<bigint, bigint>) = the interval set: 
+    //            a Label label interval set with one interval [x,y) with label z
     //            ex: x=0, y=5, z="A"
     //  ["A":[0,5), "B":[10,15)]
     // Representation invariant:
-    //   Map<string, bigint> x Map<bigint, bigint>, start Map x end Map
-    //   start Map: string label to start index of the interval set
+    //   Map<Label, bigint> x Map<bigint, bigint>, start Map x end Map
+    //   start Map: Label to start index of the interval set
     //   end Map: start index of the interval set to the end index of the set
     //   where the start index < end index, and the entries of endMap is non-overlapping
     // Safety from rep exposure:
