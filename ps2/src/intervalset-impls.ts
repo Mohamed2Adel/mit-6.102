@@ -191,5 +191,5 @@ export function implementationsForTesting(): IntervalSetCtor[] {
 }
 
 /** A constructor for an IntervalSet implementation, used by the tests. */
-type IntervalSetCtor = new <Label extends string>() => IntervalSet<string>; // remove this line in Problem 2.3
-// type IntervalSetCtor = new <Label>() => IntervalSet<Label>;
+//type IntervalSetCtor = new <Label extends string>() => IntervalSet<string>; // remove this line in Problem 2.3
+type IntervalSetCtor = new <Label>() => IntervalSet<Label>;
