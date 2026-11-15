@@ -117,7 +117,6 @@ export class RepMapIntervalSet<Label> implements IntervalSet<Label> {
         return result;
     }
 
-    // TODO toString
     /**
      * @inheritdoc
      */
@@ -150,12 +149,14 @@ export class RepArrayIntervalSet<Label> implements IntervalSet<Label> {
     //   AF(labelList:Array<Label>, valueList:Array<bigint>) = intervalSet where label_i = labelList[i] 
     //      and it's interval = [valueList[2i], valueList[2i+1]) for each i
     // Representation invariant:
-    //   for each label_i: valueList[2i] > valueList[2i+1]
+    //   for each label_i: valueList[2i] < valueList[2i+1]
     //   for labelList: non-repeated Label
     //   for valueList: non-overlapping intervals !(start_new < end_old && start_old < end_new)
     //   valueList.length == 2*labelList.length
     // Safety from rep exposure:
-    //   all methods return new Array so it cannot be modified.
+    //   interval() return new interval
+    //   add take immutable bigint
+    //   labels return new Set()
 
     /**
      * Create an empty interval set.
@@ -164,7 +165,6 @@ export class RepArrayIntervalSet<Label> implements IntervalSet<Label> {
         this.checkRep();
     }
 
-    // TODO checkRep
     private checkRep(): void {
         // length of value array equal double of label array
         assert(this.valueList.length === 2*this.labelList.length); 
@@ -205,14 +205,17 @@ export class RepArrayIntervalSet<Label> implements IntervalSet<Label> {
     /** @inheritdoc */
     public add(start: bigint, end: bigint, label: Label): void {
         this.checkRep();
-        if(this.valueList.includes(start) && this.valueList.includes(end)) {
-            return; // same intervals -> do nothing
+        const i = this.labelList.indexOf(label);
+        if(i !== -1) {
+            if(this.valueList[2*i] === start && this.valueList[2*i +1]=== end) {
+                return;
+            } // same intervals -> do nothing
         }
         if(this.labelList.includes(label)) {
-            throw new IntervalConflictError; // different interval but same label -> throw
+            throw new IntervalConflictError(); // different interval but same label -> throw
         }
         if(this.isOverLap(start, end)) {
-            throw new IntervalConflictError; // overlap intervals
+            throw new IntervalConflictError(); // overlap intervals
         }
         this.labelList.push(label);
         this.valueList.push(start);
@@ -238,7 +241,20 @@ export class RepArrayIntervalSet<Label> implements IntervalSet<Label> {
         return result;
     }
 
-    // TODO toString
+    /**
+     * @inheritdoc
+     */
+    public toString() {
+        let result : string = "{";
+        for(const label of this.labelList) {
+            result = result + label;
+            result = result + "=";
+            result = result + this.interval(label);
+            result = result + ", ";
+        }
+        result = result + "}";
+        return result;
+    }
 }
 
 /**
