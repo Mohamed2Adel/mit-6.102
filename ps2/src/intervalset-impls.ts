@@ -147,11 +147,15 @@ export class RepArrayIntervalSet<Label> implements IntervalSet<Label> {
     private readonly valueList: Array<bigint> = [];
 
     // Abstraction function:
-    //   TODO
+    //   AF(labelList:Array<Label>, valueList:Array<bigint>) = intervalSet where label_i = labelList[i] 
+    //      and it's interval = [valueList[2i], valueList[2i+1]) for each i
     // Representation invariant:
-    //   TODO
+    //   for each label_i: valueList[2i] > valueList[2i+1]
+    //   for labelList: non-repeated Label
+    //   for valueList: non-overlapping intervals !(start_new < end_old && start_old < end_new)
+    //   valueList.length == 2*labelList.length
     // Safety from rep exposure:
-    //   TODO
+    //   all methods return new Array so it cannot be modified.
 
     /**
      * Create an empty interval set.
@@ -162,23 +166,76 @@ export class RepArrayIntervalSet<Label> implements IntervalSet<Label> {
 
     // TODO checkRep
     private checkRep(): void {
-        assert(this.labelList);
-        assert(this.valueList);
+        // length of value array equal double of label array
+        assert(this.valueList.length === 2*this.labelList.length); 
+        // non-repeated labels
+        for(let i=0; i<this.labelList.length; i++) {
+            const label = this.labelList[i];
+            for(let j=i+1; j<this.labelList.length; j++) {
+                assert(label !== this.labelList[j]); 
+            }
+        }
+        // valueList[2i] < valueList[2i+1]
+        for(let i = 0; i<this.labelList.length; i++) {
+            assert(this.valueList[2*i]! < this.valueList[2*i + 1]!);
+        }
+        // no overlap 
+        for(let i=this.labelList.length-1; i>=0; i--) {
+            const startNew = this.valueList[2*i];
+            const endNew = this.valueList[2*i + 1];
+            for(let j=0; j<i; j++) {
+                const startOld = this.valueList[2*j];
+                const endOld = this.valueList[2*j + 1];
+                assert(!(startNew! < endOld! && startOld! < endNew!));
+            }
+        }
+    }
+
+    private isOverLap (start:bigint, end:bigint): boolean {
+        for(let j=0; j<this.labelList.length; j++) {
+                const startOld = this.valueList[2*j];
+                const endOld = this.valueList[2*j + 1];
+                if(start < endOld! && startOld! < end) {
+                    return true;
+                }
+            }
+        return false;
     }
 
     /** @inheritdoc */
     public add(start: bigint, end: bigint, label: Label): void {
-        throw new Error('not implemented');
+        this.checkRep();
+        if(this.valueList.includes(start) && this.valueList.includes(end)) {
+            return; // same intervals -> do nothing
+        }
+        if(this.labelList.includes(label)) {
+            throw new IntervalConflictError; // different interval but same label -> throw
+        }
+        if(this.isOverLap(start, end)) {
+            throw new IntervalConflictError; // overlap intervals
+        }
+        this.labelList.push(label);
+        this.valueList.push(start);
+        this.valueList.push(end);
+        this.checkRep();
     }
 
     /** @inheritdoc */
     public interval(label: Label): Interval | undefined {
-        throw new Error('not implemented');
+        if(!this.labelList.includes(label)) {
+            return undefined;
+        }
+        const i = this.labelList.indexOf(label);
+        return new Interval(this.valueList[2*i]!, this.valueList[2*i+1]!);
     }
 
     /** @inheritdoc */
     public labels(): Set<Label> {
-        throw new Error('not implemented');
+        const result: Set<Label>= new Set();
+        for(const i of this.labelList) {
+            result.add(i);
+        }
+        return result;
     }
 
     // TODO toString
