@@ -1,4 +1,3 @@
-import { Interval } from './interval';
 /* Copyright (c) 2021-26 MIT 6.102/6.031 course staff, all rights reserved.
  * Reconstructed for self-study from the public ps2 API docs.
  */
