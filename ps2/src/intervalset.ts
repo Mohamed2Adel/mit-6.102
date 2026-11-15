@@ -3,6 +3,7 @@
  */
 
 import { Interval } from './interval.js';
+import { RepArrayIntervalSet } from './intervalset-impls.js';
 
 /**
  * A mutable set of labeled intervals, where each unique label is associated with a non-overlapping
@@ -82,5 +83,5 @@ export class IntervalConflictError extends Error {
  */
 export function makeIntervalSet<Label>(): IntervalSet<Label> {
     // TODO Problem 3.2: one-line implementation using one of the classes in intervalset-impls.ts
-    throw new Error('not implemented');
+    return new RepArrayIntervalSet<Label>();
 }
