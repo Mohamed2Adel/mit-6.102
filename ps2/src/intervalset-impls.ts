@@ -12,9 +12,9 @@ import { IntervalSet, IntervalConflictError } from './intervalset.js';
  * PS2 instructions: you must use the provided rep.
  * You may not change the spec of the constructor.
  */
-export class RepMapIntervalSet implements IntervalSet<string> {
+export class RepMapIntervalSet<Label> implements IntervalSet<Label> {
 
-    private readonly startMap: Map<string, bigint> = new Map();
+    private readonly startMap: Map<Label, bigint> = new Map();
     private readonly endMap: Map<bigint, bigint> = new Map();
 
     // Abstraction function:
@@ -73,7 +73,7 @@ export class RepMapIntervalSet implements IntervalSet<string> {
     }
 
     /** @inheritdoc */
-    public add(start: bigint, end: bigint, label: string): void {
+    public add(start: bigint, end: bigint, label: Label): void {
         this.checkRep();
         const oldStart = this.startMap.get(label);
         if(oldStart !== undefined) {
@@ -91,7 +91,7 @@ export class RepMapIntervalSet implements IntervalSet<string> {
     }
 
     /** @inheritdoc */
-    public interval(label: string): Interval | undefined {
+    public interval(label: Label): Interval | undefined {
         const start = this.startMap.get(label);
         if(start === undefined) {
             return undefined;
@@ -105,8 +105,8 @@ export class RepMapIntervalSet implements IntervalSet<string> {
     }
 
     /** @inheritdoc */
-    public labels(): Set<string> {
-        const result: Set<string> =new Set();
+    public labels(): Set<Label> {
+        const result: Set<Label> =new Set();
         this.checkRep();
         const keys = this.startMap.keys();
         for(const key of keys) {
