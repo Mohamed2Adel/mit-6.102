@@ -19,16 +19,18 @@ export class RepMapIntervalSet<Label> implements IntervalSet<Label> {
 
     // Abstraction function:
     //   AF(Map<Label, bigint>, Map<bigint, bigint>) = the interval set: 
-    //            a Label label interval set with one interval [x,y) with label z
+    //            a Label label interval set with many interval Ex: [x,y) with label z
     //            ex: x=0, y=5, z="A"
     //  ["A":[0,5), "B":[10,15)]
     // Representation invariant:
     //   Map<Label, bigint> x Map<bigint, bigint>, start Map x end Map
-    //   start Map: Label to start index of the interval set
-    //   end Map: start index of the interval set to the end index of the set
-    //   where the start index < end index, and the entries of endMap is non-overlapping
+    //   the start index < end index, and the entries of endMap is non-overlapping.
+    //   the values of startMap equal to the keys of the endMap
     // Safety from rep exposure:
     //   all fields are private and their type is immutable
+    //   interval() return new Interval 
+    //   labels() return new Set
+    //   add() take immutable bigint and a generic Label
 
     /**
      * Create an empty interval set.
@@ -126,6 +128,7 @@ export class RepMapIntervalSet<Label> implements IntervalSet<Label> {
             result = result + label;
             result = result + "=";
             result = result + this.interval(label);
+            result = result + ", ";
         }
         result = result + "}";
         return result;

@@ -36,6 +36,8 @@ describe(SomeIntervalSet.name, function () { // PS2 instructions: do not change 
      *   labels(): Set<Label>:
      *   this: empty set, only 1 label, >1 labels
      *   output: return empty set, set["one-label"], >1 labels
+     * 
+     *   Label type: string, primitive, object
      */
     
     // covers labels() empty set
@@ -96,5 +98,28 @@ describe(SomeIntervalSet.name, function () { // PS2 instructions: do not change 
         assert.throws(() => set.add(10n, 90n, "B"), IntervalConflictError);
     });
 
+    // cover non string types
+    it('covers add then get interval with non-string type like bigint', function () {
+        const set: IntervalSet<bigint> = new SomeIntervalSet<bigint>();
+        set.add(0n, 10n, 1n);
+        assert.deepStrictEqual(set.interval(1n), new Interval(0n, 10n));
+        assert.throws(() => { set.add(5n, 15n, 1n); }, IntervalConflictError);
+    });
+    it('covers conflict wrapping interval with number type', function () {
+        const set: IntervalSet<number> = new SomeIntervalSet<number>();
+        set.add(20n, 80n, 3);
+        assert.deepStrictEqual(set.interval(3), new Interval(20n, 80n));
+        assert.throws(() => set.add(10n, 90n, 3), IntervalConflictError);
+    });
+    it('covers adding 2 different object have same value', function () {
+        const set: IntervalSet<object> = new SomeIntervalSet<object>();
+        const a = {toString: () => "x"};
+        const b = {toString: () => "x"};
+        set.add(20n, 80n, a);
+        set.add(90n, 100n, b);
+        assert.deepStrictEqual(set.interval(a), new Interval(20n, 80n));
+        assert.deepStrictEqual(set.interval(b), new Interval(90n, 100n));
+        assert.throws(() => set.add(10n, 90n, {}), IntervalConflictError);
+    });
 });
 }
