@@ -2,6 +2,8 @@
  * Reconstructed for self-study from the public ps2 API docs.
  */
 
+import { assert } from 'console';
+import { Interval } from './interval.js';
 import { IntervalSet, IntervalConflictError, makeIntervalSet } from './intervalset.js';
 
 /**
@@ -22,14 +24,20 @@ import { IntervalSet, IntervalConflictError, makeIntervalSet } from './intervals
  */
 export class MultiIntervalSet<Label> {
 
-    // TODO fields (rep must use IntervalSet, obtained via makeIntervalSet())
+    private readonly sets: Array<IntervalSet<Label>> = [];
 
     // Abstraction function:
-    //   TODO
+    //    AF(sets) = the multi-interval set where each label l is associated with the intervals
+    //    { sets[i].interval(l) | 0 <= i < sets.length and l ∈ sets[i].labels() }
+    //    e.g. sets = [{A=[0,5), B=[5,10)}, {A=[10,15)}] represents { A=[[0,5),[10,15)], B=[[5,10)] } 
     // Representation invariant:
-    //   TODO
+    //   for each intervalSet in sets there must not be a dublicated Label,
+    //   for whole intervalSet in sets there must not be overlapping index.
     // Safety from rep exposure:
-    //   TODO
+    //   sets is private readonly and never returned
+    //   constructor create a copy of initial if exist into a new Set so the client cannot mutate our Set
+    //   add() take immutable bigint, labels() return new Set, intervals() return a new interval Set
+    //   clear() only clear our set and not mutating the initial set of the client 
 
     /**
      * Create a new multi-interval set containing the given labeled intervals; or empty if none
@@ -37,10 +45,71 @@ export class MultiIntervalSet<Label> {
      * @param initial optional initial contents of the new multi-interval set
      */
     public constructor(initial?: IntervalSet<Label>) {
-        throw new Error('not implemented');
+        if(initial) {
+            for(const l of initial.labels()) {
+                const iv = initial.interval(l)!;
+                this.add(iv.start, iv.end, l);
+            }
+        }
+        this.checkRep();
     }
 
-    // TODO checkRep
+    private checkRep() {
+        if(this.sets.length !== 0) {
+            for(const set of this.sets) {
+                assert(set !== undefined);
+            }
+            for(const [, iv] of this.all()) {
+                for(let i=0; i<this.all.length; i++) {
+                    if(this.isOverLap(iv.start, iv.end)) {
+                        throw new IntervalConflictError();
+                    }
+                }
+            }
+        }
+    }
+
+    // helper to get all labels and intervals in seperate array
+    private all(): Array<[Label, Interval]> {
+        const result: Array<[Label, Interval]> = [];
+        for(const set of this.sets) {
+            for(const l of set.labels()) {
+                result.push([l, set.interval(l)!]);
+            }
+        }
+        return result;
+    }
+    // helper to check overLap condition
+    private isOverLap(start:bigint, end:bigint): boolean {
+        for(const [ , interval] of this.all()) {
+            const startOld = interval.start;
+            const endOld = interval.end;
+            if(start<endOld && startOld<end) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // helper to check is label exist or not, and how many time. for ex: if A exist 1 so if we need 
+    // to insert another interval for A we insert it in index 1 not 0, if A exist twice so we insert it at index 2 ..
+    private countLabel(label:Label): number {
+        let count = 0;
+        for(const [l, ] of this.all()){
+            if(label === l) {
+                count = count + 1;
+            }
+        }
+        return count;
+    }
+    // helper to check if the interval already exist
+    private isSameLabelAndSameInterval(start:bigint, end:bigint, label:Label): boolean {
+        for(const [l, interval] of this.all()) {
+            if(start === interval.start && end === interval.end && label === l) {
+                return true;
+            } 
+        }
+        return false;
+    }
 
     /**
      * Add a labeled interval to this set, if it is not already present and it does not conflict with
@@ -63,7 +132,23 @@ export class MultiIntervalSet<Label> {
      *         with a different label overlaps [start,end)
      */
     public add(start: bigint, end: bigint, label: Label): void {
-        throw new Error('not implemented');
+        if(this.isSameLabelAndSameInterval(start,end,label)) {
+            return;
+        }
+        if(this.isOverLap(start, end)) {
+            throw new IntervalConflictError();
+        }
+        const k = this.countLabel(label); 
+        const layer = this.sets[k];
+        if(layer !== undefined) {
+            layer.add(start, end, label); // if layer already exist add to it at index[k]
+        }
+        else {
+            const set = makeIntervalSet<Label>(); // if layer not exist create a new one and push in array
+            set.add(start, end, label);
+            this.sets.push(set);
+        }
+        this.checkRep();
     }
 
     /**
@@ -72,7 +157,14 @@ export class MultiIntervalSet<Label> {
      * @returns true if this set was non-empty, and false otherwise
      */
     public clear(): boolean {
-        throw new Error('not implemented');
+        if(this.sets.length !== 0) {
+            for(let i=0; i<this.sets.length; i++) {
+                this.sets.pop();
+            }
+            this.sets.length = 0;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -81,7 +173,11 @@ export class MultiIntervalSet<Label> {
      * @returns the labels in this set
      */
     public labels(): Set<Label> {
-        throw new Error('not implemented');
+        const result = new Set<Label>();
+        for(const [l,] of this.all()) {
+            result.add(l);
+        }
+        return result;
     }
 
     /**
@@ -97,9 +193,34 @@ export class MultiIntervalSet<Label> {
      *          label in this set
      */
     public intervals(label: Label): IntervalSet<number> {
-        throw new Error('not implemented');
+        const result: IntervalSet<number> = makeIntervalSet();
+        if(this.countLabel(label) === 0) {
+            return result;
+        }
+        let k = this.countLabel(label);
+        for(const [l, interval] of this.all().sort()) {
+            if(l === label) {
+                result.add(interval.start, interval.end, this.countLabel(label)-k);
+                k = k-1;
+            }
+        }
+        return result;
     }
 
-    // TODO toString
-
+    /**
+     * @inheritdoc
+     */
+    public toString() {
+        let result : string = "{";
+        for(const [l, iv] of this.all()) {
+            result = result + l;
+            result = result + "=";
+            result = result + iv;
+            result = result + ", ";
+        }
+        result = result.slice(0, result.length - 2);
+        result = result + "}";
+        return result;
+    }
+    
 }
