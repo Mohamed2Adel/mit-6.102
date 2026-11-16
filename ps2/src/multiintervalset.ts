@@ -32,12 +32,15 @@ export class MultiIntervalSet<Label> {
     //    e.g. sets = [{A=[0,5), B=[5,10)}, {A=[10,15)}] represents { A=[[0,5),[10,15)], B=[[5,10)] } 
     // Representation invariant:
     //   for each intervalSet in sets there must not be a dublicated Label,
-    //   for whole intervalSet in sets there must not be overlapping index.
+    //   for whole intervalSet in sets there must not be overlapping interval at any index.
+    //   no IntervalSet in sets is empty
+    //   each label l appears in exactly sets[0...k-1] for some k>=1
     // Safety from rep exposure:
     //   sets is private readonly and never returned
     //   constructor create a copy of initial if exist into a new Set so the client cannot mutate our Set
     //   add() take immutable bigint, labels() return new Set, intervals() return a new interval Set
     //   clear() only clear our set and not mutating the initial set of the client 
+    //   labels may be mutable object share with client which is unavoidable
 
     /**
      * Create a new multi-interval set containing the given labeled intervals; or empty if none
@@ -55,16 +58,17 @@ export class MultiIntervalSet<Label> {
     }
 
     private checkRep() {
-        if(this.sets.length !== 0) {
-            for(const set of this.sets) {
-                assert(set !== undefined);
-            }
-            for(const [, iv] of this.all()) {
-                for(let i=0; i<this.all.length; i++) {
-                    if(this.isOverLap(iv.start, iv.end)) {
-                        throw new IntervalConflictError();
-                    }
-                }
+        for(const set of this.sets) {
+            assert(set.labels().size > 0);
+        }
+        const pairs = this.all();
+        for(let i=0; i<pairs.length; i++) {
+            const startNew = pairs[i]?.[1].start;
+            const endNew = pairs[i]?.[1].end;
+            for(let j=i+1; j<pairs.length; j++) {
+                const startOld = pairs[j]?.[1].start;
+                const endOld = pairs[j]?.[1].end;
+                assert(!(startNew!<endOld! && startOld!<endNew!));
             }
         }
     }
@@ -158,9 +162,6 @@ export class MultiIntervalSet<Label> {
      */
     public clear(): boolean {
         if(this.sets.length !== 0) {
-            for(let i=0; i<this.sets.length; i++) {
-                this.sets.pop();
-            }
             this.sets.length = 0;
             return true;
         }
@@ -193,7 +194,7 @@ export class MultiIntervalSet<Label> {
      *          label in this set
      */
     public intervals(label: Label): IntervalSet<number> {
-        const result: IntervalSet<number> = makeIntervalSet();
+        const result: IntervalSet<number> = makeIntervalSet<number>();
         if(this.countLabel(label) === 0) {
             return result;
         }
@@ -206,17 +207,9 @@ export class MultiIntervalSet<Label> {
     /**
      * @inheritdoc
      */
-    public toString() {
-        let result : string = "{";
-        for(const [l, iv] of this.all()) {
-            result = result + l;
-            result = result + "=";
-            result = result + iv;
-            result = result + ", ";
-        }
-        result = result.slice(0, result.length - 2);
-        result = result + "}";
-        return result;
+    public toString(): string {
+        const entries = this.all().map(([l, iv]) => `${l}=${iv}`);
+        return "{" + entries.join(", ") + "}";
     }
     
 }
