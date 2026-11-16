@@ -197,13 +197,9 @@ export class MultiIntervalSet<Label> {
         if(this.countLabel(label) === 0) {
             return result;
         }
-        let k = this.countLabel(label);
-        for(const [l, interval] of this.all().sort()) {
-            if(l === label) {
-                result.add(interval.start, interval.end, this.countLabel(label)-k);
-                k = k-1;
-            }
-        }
+        const ivs = this.all().filter(([l,]) => l === label).map(([,iv])=> iv);
+        ivs.sort((a,b) => a.start < b.start ? -1: a.start > b.start ? 1:0);
+        ivs.forEach((iv, i) => result.add(iv.start, iv.end, i));
         return result;
     }
 
