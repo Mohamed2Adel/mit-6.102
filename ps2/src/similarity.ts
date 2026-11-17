@@ -98,7 +98,7 @@ export class LabelSimilarityTable {
         }
         // search for the similarity in the Array
         for(const tuble of this.similarities) {
-            if(tuble[0] === a||b && tuble[1] === b||a) {
+            if((tuble[0] === a && tuble[1] === b) || (tuble[0] === b && tuble[1] === a)) {
                 return tuble[2];
             }
         }
