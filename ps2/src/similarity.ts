@@ -71,3 +71,38 @@ export function similarity(
 }
 
 // TODO Problem 5.2: specify (and later implement) your helper ADT as a class here.
+/**
+ * Immutable lookup table for similarities, default 1 (same), 0 (different).
+ */
+export class LabelSimilarityTable {
+
+    private similarities:Array<LabelSimilarity>;
+    /**
+     * 
+     * @param similarities array of [string, string, value] tuples; each value is in [0, 1]
+     */
+    constructor(similarities:Array<LabelSimilarity>){
+        this.similarities = similarities;
+    }
+    /**
+     * public method to get the similarity between two strings
+     * @param a string 
+     * @param b string  
+     * @returns similarity between a and b or b and a the order doesn't matter, return by default 1 
+     *          if a === b, and 0 if a !==b and there is no similarity between them. Type:number
+     */
+    public get(a:string, b:string):number {
+        // return 1 if two strings are identical 
+        if(a === b) {
+            return 1;
+        }
+        // search for the similarity in the Array
+        for(const tuble of this.similarities) {
+            if(tuble[0] === a||b && tuble[1] === b||a) {
+                return tuble[2];
+            }
+        }
+        // if not in the Array and not identical then return 0
+        return 0;
+    }
+}
