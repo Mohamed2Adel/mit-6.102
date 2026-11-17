@@ -2,6 +2,7 @@
  * Reconstructed for self-study from the public ps2 API docs.
  */
 
+import { assert } from 'console';
 import { MultiIntervalSet } from './multiintervalset.js';
 
 /**
@@ -67,23 +68,38 @@ export function similarity(
     setA: MultiIntervalSet<string>,
     setB: MultiIntervalSet<string>,
 ): number {
-    throw new Error('not implemented');
+    
+    throw new Error ('not implemented yet');
 }
 
 
 /**
  * Immutable lookup table for similarities, default 1 (same), 0 (different).
+ * 
+ * AF: AF(similarities:Array<LabelSimilarity>)= symmtetric function sim(a, b)= value in [0, 1],
+ *     eg. similarities[[string, string, value],[string, string, value],...] 
+ * RI: every value is in [0, 1], and no unordered pair appear twice
+ * SRE: our array is readonly and we copied the client's array so not to mutate it,
+ *      get method return a immutable number.
  */
 export class LabelSimilarityTable {
 
-    private similarities:Array<LabelSimilarity>;
+    private readonly similarities:Array<LabelSimilarity>;
     /**
      * 
      * @param similarities array of [string, string, value] tuples; each value is in [0, 1]
      */
     constructor(similarities:Array<LabelSimilarity>){
-        this.similarities = similarities;
+        this.similarities = similarities.map(([a, b, v]) => [a, b, v]);
+        this.checkRep();
     }
+
+    private checkRep(){
+        for(const tuple of this.similarities) {
+            assert(0 <= tuple[2] && tuple[2] <= 1);
+        }
+    }
+
     /**
      * public method to get the similarity between two strings
      * @param a string 
@@ -92,15 +108,16 @@ export class LabelSimilarityTable {
      *          if a === b, and 0 if a !==b and there is no similarity between them. Type:number
      */
     public get(a:string, b:string):number {
-        // return 1 if two strings are identical 
-        if(a === b) {
-            return 1;
-        }
+        this.checkRep();
         // search for the similarity in the Array
         for(const tuble of this.similarities) {
             if((tuble[0] === a && tuble[1] === b) || (tuble[0] === b && tuble[1] === a)) {
                 return tuble[2];
             }
+        }
+        // return 1 if two strings are identical 
+        if(a === b) {
+            return 1;
         }
         // if not in the Array and not identical then return 0
         return 0;
