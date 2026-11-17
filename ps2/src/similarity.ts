@@ -2,8 +2,9 @@
  * Reconstructed for self-study from the public ps2 API docs.
  */
 
-import { assert } from 'console';
+import assert from 'assert';
 import { MultiIntervalSet } from './multiintervalset.js';
+import { Interval } from './interval.js';
 
 /**
  * A 3-tuple associating a string pair with a number.
@@ -69,7 +70,67 @@ export function similarity(
     setB: MultiIntervalSet<string>,
 ): number {
     
-    throw new Error ('not implemented yet');
+    const table = new LabelSimilarityTable(similarities);
+
+    // flatten the set into Array of [label, intervals]
+    const listA: Array<[string, Interval]> = [];
+    const listB: Array<[string, Interval]> = [];
+    for(const a of setA.labels()) {
+        for(const ia of setA.intervals(a).labels()) {
+            listA.push([a, setA.intervals(a).interval(ia)!]);
+        }
+    }
+    for(const b of setB.labels()) {
+        for(const ib of setB.intervals(b).labels()) {
+            listB.push([b, setB.intervals(b).interval(ib)!]);
+        }
+    }
+
+    // compute span
+    let min: bigint | undefined = undefined;
+    let max: bigint | undefined = undefined;
+    for(const [, ia] of listA) {
+        if(min === undefined || ia.start < min) {
+            min = ia.start;
+        }
+        if(max === undefined || ia.end > max) {
+            max = ia.end;
+        }
+    }
+    for(const [, ib] of listB) {
+        if(min === undefined || ib.start < min) {
+            min = ib.start;
+        }
+        if(max === undefined || ib.end > max) {
+            max = ib.end;
+        }
+    }
+    if(min === undefined || max === undefined) {
+        return 0;
+    }
+    const span = max - min;
+    // compute sum
+    let sum = 0;
+    // sum = (shared length interval between setA and setB) x (sim(a,b))
+    // overlap = min(end1, end2) - max(start1, start2)
+    // if overlap > 0, then there is shared interval 
+    // sum = overlap x sim(a, b)
+    // else overlap <= 0, then there is no shared interval
+    // sum = 0 x sim(a, b) = 0
+    for(const [a , ia] of listA) {
+        for(const [b, ib] of listB) {
+            const minEnd = ia.end < ib.end ? ia.end: ib.end;
+            const maxStart = ia.start > ib.start ? ia.start: ib.start;
+            const overlap = minEnd - maxStart;
+            if(overlap > 0) {
+                sum = sum + (Number(overlap) * table.get(a, b));
+            }
+        }
+    }
+
+    // compute sim = sum / span
+    const sim: number = sum / Number(span) ;
+    return sim;
 }
 
 
