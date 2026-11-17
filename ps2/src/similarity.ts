@@ -70,7 +70,7 @@ export function similarity(
     throw new Error('not implemented');
 }
 
-// TODO Problem 5.2: specify (and later implement) your helper ADT as a class here.
+
 /**
  * Immutable lookup table for similarities, default 1 (same), 0 (different).
  */

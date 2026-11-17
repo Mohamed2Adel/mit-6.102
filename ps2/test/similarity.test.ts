@@ -96,7 +96,7 @@ describe('similarity', function () {
 
 });
 
-// TODO Problem 5.2: describe(...) suite for your helper ADT
+
 describe('LabelSimilarityTable', function(){
     // Testing strategy
     /** 
