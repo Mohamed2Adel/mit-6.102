@@ -3,7 +3,7 @@
  */
 
 import assert from 'node:assert';
-import { similarity } from '../src/similarity.js';
+import { similarity, LabelSimilarityTable, LabelSimilarity } from '../src/similarity.js';
 import { MultiIntervalSet } from '../src/multiintervalset.js';
 
 /*
@@ -97,3 +97,54 @@ describe('similarity', function () {
 });
 
 // TODO Problem 5.2: describe(...) suite for your helper ADT
+describe('LabelSimilarityTable', function(){
+    // Testing strategy
+    /** 
+     * partition on a, b: a&b are same, a&b are different, a&b are in Table, are not in Table
+     *                    cover a,b in different order.
+     * partition on output: =1, =0, in
+     */
+
+    // covers a and b are same and output = 1
+    it('covers a and b are same',function(){
+        const similarities:Array<LabelSimilarity>=[
+            ["A", "B", 0.6],
+            ["C", "D", 0.2],
+        ];
+        const table = new LabelSimilarityTable(similarities);
+        assert.strictEqual(table.get("same", "same"), 1);
+    });
+
+    // covers a and b are different and not in table and out=0
+    it('covers a and b are different and not in table => out = 0',function(){
+        const similarities:Array<LabelSimilarity>=[
+            ["A", "B", 0.6],
+            ["C", "D", 0.2],
+        ];
+        const table = new LabelSimilarityTable(similarities);
+        assert.strictEqual(table.get("E", "F"), 0);
+    });
+
+    // covers a and b are different and in table, out in between
+    it('covers a and b are different and in table',function(){
+        const similarities:Array<LabelSimilarity>=[
+            ["A", "B", 0.6],
+            ["C", "D", 0.2],
+        ];
+        const table = new LabelSimilarityTable(similarities);
+        assert.strictEqual(table.get("A", "B"), 0.6);
+    });
+
+    // covers a and b are in orders and swapped order
+    it('covers a and b are in orders and swapped order',function(){
+        const similarities:Array<LabelSimilarity>=[
+            ["A", "B", 0.6],
+            ["C", "D", 0.2],
+        ];
+        const table = new LabelSimilarityTable(similarities);
+        assert.strictEqual(table.get("C", "D"), 0.2);
+        assert.strictEqual(table.get("D", "C"), 0.2);
+    });
+
+
+}); 
