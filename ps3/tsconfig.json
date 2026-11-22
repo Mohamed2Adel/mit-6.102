@@ -1,0 +1,25 @@
+{
+  "include": [
+    "./src/**/*.ts",
+    "./test/**/*.ts",
+  ],
+
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+
+    "target": "esnext",
+    "module": "nodenext",
+    "esModuleInterop": true,
+    "rewriteRelativeImportExtensions": true, // write imports as './expression.ts' (course style)
+    "sourceMap": true,
+    "outDir": "dist",
+    "lib": ["esnext", "dom"],                // dom: for the web UI (src/web.ts)
+    "types": ["node", "mocha"],
+  },
+}

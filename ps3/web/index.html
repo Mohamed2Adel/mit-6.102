@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Memely</title>
+<!-- the compiled code uses bare imports; map them to files the web server sends -->
+<script type="importmap">
+{
+  "imports": {
+    "parserlib": "/parserlib/parserlib.js",
+    "node:assert": "/assert.js"
+  }
+}
+</script>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2em; max-width: 60em; }
+  textarea { width: 100%; height: 6em; font-family: ui-monospace, monospace; font-size: 1em; }
+  dt { font-weight: bold; margin-top: 1em; }
+  #parsed, #size { font-family: ui-monospace, monospace; }
+  #error { color: #b00; white-space: pre-wrap; font-family: ui-monospace, monospace; }
+  #output { background: repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 0 0 / 16px 16px; max-width: 100%; }
+  #library { color: #666; }
+</style>
+</head>
+<body>
+<h1>Memely</h1>
+<p>Images: <span id="library">loading...</span></p>
+<form id="form">
+  <textarea id="input">tech1.png | tech2.png</textarea>
+  <button type="submit">Generate</button>
+</form>
+<dl>
+  <dt>Expression</dt><dd id="parsed"></dd>
+  <dt>Size</dt><dd id="size"></dd>
+  <dd id="error"></dd>
+  <dt>Image</dt><dd><img id="output" alt=""></dd>
+</dl>
+<script type="module" src="/dist/src/web.js"></script>
+</body>
+</html>
