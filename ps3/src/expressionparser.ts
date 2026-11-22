@@ -10,6 +10,7 @@
 import assert from 'node:assert';
 import { type Parser, type ParseTree, compile, visualizeAsUrl } from 'parserlib';
 import type { MemeExpression } from './expression.ts';
+import { Filename } from './expression-impls.ts';
 
 // Problem 2.1: extend this grammar to the full language (captions, ---, ^, _, @ with ?).
 // This starting grammar recognizes only filenames, side-by-side gluing |, and @-resizing

@@ -6,6 +6,7 @@ import assert from 'node:assert';
 import { ImageLibrary } from '../src/imagelibrary.ts';
 // TODO after Problem 2: this file should NOT import expression-impls.ts
 import { type MemeExpression, parse } from '../src/expression.ts';
+import { Filename } from '../src/expression-impls.ts';
 
 /**
  * Tests for the MemeExpression abstract data type.
