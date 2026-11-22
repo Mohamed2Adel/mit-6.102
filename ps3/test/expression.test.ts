@@ -4,10 +4,7 @@
 
 import assert from 'node:assert';
 import { ImageLibrary } from '../src/imagelibrary.ts';
-// TODO after Problem 2: this file should NOT import expression-impls.ts
 import { type MemeExpression, parse } from '../src/expression.ts';
-import { Filename, Resize, SideBySide } from '../src/expression-impls.ts';
-// TODO switch to parse later, but for now import 3 classes and create directly.
 
 /**
  * Tests for the MemeExpression abstract data type.
@@ -33,74 +30,57 @@ describe('MemeExpression', function () {
     //   image operation:
 
     it('covers passing non integer Width or Height and throw', function () {
-        const name = new Filename("picture1.jpg");
-        assert.throws(()=>new Resize(name, 100.8, 50));
-        assert.throws(()=>new Resize(name, 100, 50.9));
+        assert.throws(()=>parse('picture1.jpg@100.8x50'));
+        assert.throws(()=>parse('picture1.jpg@100x50.9'));
     });
     
     it('covers toString() the leaf only', function () {
-        const name = new Filename("picture1.jpg");
-        assert.equal(name.toString(), 'picture1.jpg')
+        const name = parse('picture1.jpg');
+        assert(name.equalValue(parse(name.toString())));
     });
 
     it('covers toString() the nested Resize containt SideBySide', function () {
-        const left = new Filename("Left.jpg");
-        const right = new Filename("Right.jpg");
-        const side = new SideBySide(left, right);
-        const resize = new Resize(side, 100, 50);
-        assert.strictEqual(resize.toString(), '((Left.jpg|Right.jpg))@100x50');
+        const resize = parse('(Left.jpg|Right.jpg)@100x50');
+        assert(resize.equalValue(parse(resize.toString())));
     });
 
     it('covers toString() the nested SideBySide containt Resize', function () {
-        const left = new Filename("Left.jpg");
-        const right = new Filename("Right.jpg");
-        const resizeRight = new Resize(right, 100, 50);
-        const side = new SideBySide(left, resizeRight);
-        assert.strictEqual(side.toString(), '(Left.jpg|(Right.jpg)@100x50)');
+        const side = parse('Left.jpg|Right.jpg@100x50');
+        assert(side.equalValue(parse(side.toString())));
     });
 
     it('covers equalValue() true', function () {
-        const name = new Filename("picture1.jpg");
-        const secondName = new Filename("picture1.jpg");
+        const name = parse('picture1.jpg');
+        const secondName = parse('picture1.jpg');
         assert.strictEqual(name.equalValue(secondName), true);
     });
 
     it('covers equalValue() false, differ in filename', function () {
-        const name = new Filename("picture1.jpg");
-        const secondName = new Filename("picture2.jpg");
+        const name = parse('picture1.jpg');
+        const secondName = parse('picture2.jpg');
         assert.strictEqual(name.equalValue(secondName), false);
     });
 
     it('covers equalValue() false, differ in Width', function () {
-        const name = new Filename("picture1.jpg");
-        const resize = new Resize(name, 100, 50);
-        const secondName = new Filename("picture1.jpg");
-        const secondResize = new Resize(secondName, 150, 50);
+        const resize = parse('picture1.jpg@100x50');
+        const secondResize = parse('picture1.jpg@150x50');
         assert.strictEqual(resize.equalValue(secondResize), false);
     });
 
     it('covers equalValue() false, differ in Height', function () {
-        const name = new Filename("picture1.jpg");
-        const resize = new Resize(name, 100, 50);
-        const secondName = new Filename("picture1.jpg");
-        const secondResize = new Resize(secondName, 100, 80);
+        const resize = parse('picture1.jpg@100x50');
+        const secondResize = parse('picture1.jpg@100x80');
         assert.strictEqual(resize.equalValue(secondResize), false);
     });
 
     it('covers equalValue() false, differ in order', function () {
-        const a = new Filename("a.jpg");
-        const b = new Filename("b.jpg");
-        const ab = new SideBySide(a,b);
-        assert.strictEqual(ab.toString(), "(a.jpg|b.jpg)");
-        assert.strictEqual(ab.equalValue(new SideBySide(b,a)), false);
+        const ab = parse('a.jpg|b.jpg');
+        assert.strictEqual(ab.equalValue(parse('b.jpg|a.jpg')), false);
     });
 
     it('covers equalValue() false, differ in order', function () {
-        const a = new Filename("a.jpg");
-        const b = new Filename("b.jpg");
-        const ab = new SideBySide(a,b);
-        assert.strictEqual(ab.toString(), "(a.jpg|b.jpg)");
-        assert.strictEqual(ab.equalValue(new SideBySide(b,a)), false);
+        const ab = parse('a.jpg|b.jpg');
+        assert.strictEqual(ab.equalValue(parse('b.jpg|a.jpg')), false);
     });
 
 
