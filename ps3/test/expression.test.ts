@@ -26,6 +26,17 @@ describe('MemeExpression', function () {
     //      differs in: filename, Width, Height, left child, right child, order a|b and b|a
     //      grouping: (a|b)|c vs a|(b|c)   (your spec: binary, so NOT equal)
     //   parse():
+    //      input: valid, invalid (throws Error)
+    //      valid, operators: none (filename only), |, @, both
+    //      valid, chain length of the same operator: 1, 2, more than 2
+    //      valid, grouping: left to right by default, overridden by parentheses
+    //      valid, precedence: @ applies before |
+    //      valid, filename characters: letters/digits only, also contains . - _, starts with .
+    //      valid, whitespace: none, spaces, tabs/newlines/carriage returns
+    //      valid, parentheses: none, around one operand, redundant (nested or around everything)
+    //      invalid: | missing an operand, empty or unbalanced parentheses, incomplete @ size,
+    //               size of 0, non-digit size (? or decimal), illegal filename (starts with - or _,
+    //               contains a space, _ attached to a filename), empty input
     //   size operation:
     //   image operation:
 
@@ -83,6 +94,73 @@ describe('MemeExpression', function () {
         assert.strictEqual(ab.equalValue(parse('b.jpg|a.jpg')), false);
     });
 
+
+    it('covers parse() filename with . - _ characters and leading period', function () {
+        assert(parse('image-file_3').equalValue(parse('image-file_3')));
+        assert(parse('.hidden.png').equalValue(parse('.hidden.png')));
+        assert(!parse('image-file_3').equalValue(parse('image-file-3')));
+    });
+
+    it('covers parse() whitespace: spaces, tabs, newlines and carriage returns are ignored', function () {
+        const expected = parse('a.jpg|b.jpg@1x2');
+        assert(expected.equalValue(parse('  a.jpg  |  b.jpg @ 1x2  ')));
+        assert(expected.equalValue(parse('a.jpg\t|\r\n b.jpg\n@\t1x2')));
+    });
+
+    it('covers parse() redundant parentheses are ignored', function () {
+        assert(parse('a.jpg').equalValue(parse('((a.jpg))')));
+        assert(parse('a.jpg|b.jpg').equalValue(parse('((a.jpg)|(b.jpg))')));
+        assert(parse('a.jpg@1x2').equalValue(parse('(a.jpg)@1x2')));
+    });
+
+    it('covers parse() chain of more than 2 |: groups left to right', function () {
+        assert(parse('a.jpg|b.jpg|c.jpg').equalValue(parse('(a.jpg|b.jpg)|c.jpg')));
+        assert(!parse('a.jpg|b.jpg|c.jpg').equalValue(parse('a.jpg|(b.jpg|c.jpg)')));
+        assert(parse('a.jpg|b.jpg|c.jpg').equalValue(parse('(a.jpg|b.jpg|c.jpg)')));
+    });
+
+    it('covers parse() chain of 2 @: applied left to right, none dropped', function () {
+        assert(parse('a.jpg@1x2@3x4').equalValue(parse('(a.jpg@1x2)@3x4')));
+        assert(!parse('a.jpg@1x2@3x4').equalValue(parse('a.jpg@1x2')));
+        assert(!parse('a.jpg@1x2@3x4').equalValue(parse('a.jpg@3x4@1x2')));
+    });
+
+    it('covers parse() precedence: @ applies before |, parentheses override it', function () {
+        assert(parse('a.jpg|b.jpg@1x2').equalValue(parse('a.jpg|(b.jpg@1x2)')));
+        assert(!parse('a.jpg|b.jpg@1x2').equalValue(parse('(a.jpg|b.jpg)@1x2')));
+    });
+
+    it('covers toString() round trip, | nested on the right', function () {
+        const expr = parse('a.jpg|(b.jpg|c.jpg)');
+        assert(expr.equalValue(parse(expr.toString())));
+    });
+
+    it('covers toString() round trip, deep nesting with both operators', function () {
+        const expr = parse('((a.jpg|b.jpg)@1x2|(c.jpg|d.jpg@5x6))@3x4');
+        assert(expr.equalValue(parse(expr.toString())));
+    });
+
+    it('covers parse() invalid input throws Error', function () {
+        for (const input of [
+            '',                 // empty input
+            '|a.jpg|b.jpg|',    // | missing operands
+            'a.jpg|',           // | missing right operand
+            'a.jpg||b.jpg',     // | missing middle operand
+            '()',               // empty parentheses
+            '(a.jpg',           // unbalanced parentheses
+            'a.jpg@1x',         // incomplete size
+            'a.jpg@1',          // incomplete size
+            'a.jpg@0x5',        // width 0
+            'a.jpg@5x0',        // height 0
+            'a.jpg@?x?',        // ? (not supported yet) and ?x? (never legal)
+            '-a.jpg',           // filename starts with -
+            '_a.jpg',           // filename starts with _
+            'a b.jpg',          // space inside filename
+            'a.jpg_"b"',        // _ attached to the filename
+        ]) {
+            assert.throws(() => parse(input), Error, `expected ${JSON.stringify(input)} to throw`);
+        }
+    });
 
     it('covers the image library', function () {
         // sanity check of the provided ImageLibrary and the sample images

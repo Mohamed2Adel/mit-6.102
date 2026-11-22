@@ -28,7 +28,8 @@ export interface MemeExpression {
     /**
      * @param that any MemeExpression
      * @returns true if and only if this and that are structurally-equal MemeExpressions,
-     *          as defined in the PS3 handout
+     *          as defined in the PS3 handout; grouping is part of the structure, so
+     *          (A | B) | C and A | (B | C) are not equal
      */
     equalValue(that: MemeExpression): boolean;
 
@@ -47,8 +48,9 @@ export interface MemeExpression {
  * parseExpression() in expressionparser.ts.
  *
  * @param input expression to parse, as defined in the PS3 handout
- * @returns expression AST for the input
- * @throws Error if the expression is syntactically invalid
+ * @returns expression AST for the input, where operators of the same kind group left to right:
+ *          A | B | C means (A | B) | C, and A @ 1x2 @ 3x4 means (A @ 1x2) @ 3x4
+ * @throws Error if the expression is syntactically invalid, including a width or height of 0
  */
 export function parse(input: string): MemeExpression {
     return parseExpression(input);
