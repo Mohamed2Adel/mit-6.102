@@ -10,7 +10,7 @@
 import assert from 'node:assert';
 import { type Parser, type ParseTree, compile, visualizeAsUrl } from 'parserlib';
 import type { MemeExpression } from './expression.ts';
-import { Filename } from './expression-impls.ts';
+import { Filename, SideBySide, Resize } from './expression-impls.ts';
 
 // Problem 2.1: extend this grammar to the full language (captions, ---, ^, _, @ with ?).
 // This starting grammar recognizes only filenames, side-by-side gluing |, and @-resizing
@@ -71,16 +71,24 @@ function makeAbstractSyntaxTree(parseTree: ParseTree<ExpressionGrammar>): MemeEx
         // expression ::= resize ('|' resize)*;
         const children = parseTree.childrenByName(ExpressionGrammar.Resize);
         const subexprs = children.map(makeAbstractSyntaxTree);
-        void subexprs;
-        assert.fail('TODO: build a side-by-side glue expression from subexprs (or return the only one)');
+        const expr: MemeExpression = subexprs.reduce((left, right) => new SideBySide(left, right));
+        return expr;
 
     } else if (parseTree.name === ExpressionGrammar.Resize) {
         // resize ::= primitive ('@' number 'x' number)*;
         const primitive = makeAbstractSyntaxTree(parseTree.childrenByName(ExpressionGrammar.Primitive)[0]
                                                  ?? assert.fail('missing primitive'));
         const numbers = parseTree.childrenByName(ExpressionGrammar.Number).map(child => parseInt(child.text));
-        void primitive; void numbers;
-        assert.fail('TODO: apply each (width, height) pair in numbers as a resize of primitive');
+        let result: MemeExpression = primitive;
+        for (let i = 0; i < numbers.length; i += 2) {
+            const width = numbers[i];
+            const height = numbers[i + 1];
+            if(width === 0 || width === undefined || height === undefined) {
+                throw new Error('width and height must be > 0');
+            }
+            result = new Resize(result, width, height);
+        }
+        return result;
 
     } else if (parseTree.name === ExpressionGrammar.Primitive) {
         // primitive ::= filename | '(' expression ')';
@@ -97,8 +105,7 @@ function makeAbstractSyntaxTree(parseTree: ParseTree<ExpressionGrammar>): MemeEx
     } else if (parseTree.name === ExpressionGrammar.Filename) {
         // filename ::= [A-Za-z0-9.][A-Za-z0-9._-]*;
         const filename: string = parseTree.text;
-        void filename;
-        assert.fail('TODO: make a filename expression');
+        return new Filename(filename);
 
     } else {
         assert.fail(`cannot make AST for ${ExpressionGrammar[parseTree.name]} node`);

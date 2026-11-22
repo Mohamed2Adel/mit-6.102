@@ -95,8 +95,8 @@ export class Resize implements MemeExpression {
     }
 
     private checkRep() {
-        assert(this.newHeight > 0);
-        assert(this.newWidth > 0);
+        assert(this.newHeight > 0, 'height must be > 0');
+        assert(this.newWidth > 0, 'width must be > 0');
         assert(Number.isInteger(this.newHeight));
         assert(Number.isInteger(this.newWidth));
     }
