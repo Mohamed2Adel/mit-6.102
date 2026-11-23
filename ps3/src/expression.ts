@@ -38,7 +38,7 @@ export interface MemeExpression {
     /**
      * 
      * @param library an imageLibrary
-     * @returns the size of the image in format WxH this expression generate.
+     * @returns the size of the image {width, height} this expression generate.
      * @throws when the filename is not in the library.
      */
     size(library: ImageLibrary): {Width:number, Height:number};
