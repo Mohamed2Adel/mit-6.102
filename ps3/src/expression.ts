@@ -5,6 +5,7 @@
 // This file may import from expressionparser.ts and expression-impls.ts (see Problem 1,
 // option 2), but should NOT import ImageLibrary for Problems 1 and 2.
 import { parseExpression } from './expressionparser.ts';
+import { ImageLibrary } from './imagelibrary.ts';
 
 /**
  * An immutable data type representing an image meme expression, as defined in the PS3 handout.
@@ -34,6 +35,13 @@ export interface MemeExpression {
     equalValue(that: MemeExpression): boolean;
 
     // TODO Problem 3.1: size operation (takes an ImageLibrary)
+    /**
+     * 
+     * @param library an imageLibrary
+     * @returns the size of the image in format WxH this expression generate.
+     * @throws when the filename is not in the library.
+     */
+    size(library: ImageLibrary): {Width:number, Height:number};
 
     // TODO Problem 4.1: image operation (takes an ImageLibrary, returns a Canvas)
 
