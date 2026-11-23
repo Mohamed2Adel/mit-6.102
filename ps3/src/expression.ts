@@ -41,7 +41,7 @@ export interface MemeExpression {
      * @returns the size of the image {width, height} this expression generate.
      * @throws when the filename is not in the library.
      */
-    size(library: ImageLibrary): {Width:number, Height:number};
+    size(library: ImageLibrary): {readonly width:number, readonly height:number};
 
     // TODO Problem 4.1: image operation (takes an ImageLibrary, returns a Canvas)
 
