@@ -212,7 +212,7 @@ describe('MemeExpression', function () {
     });
 
     it('cover image in Library and nested | with second operand is missing', function() {
-        assert.deepStrictEqual(parse('boromir.jpg|notExist').size(library), {width:200,height:50});
+        assert.throws(() => parse('boromir.jpg|notExist').size(library));
     });
 
     it('cover image in Library and chained |', function() {
@@ -221,5 +221,9 @@ describe('MemeExpression', function () {
 
     it('cover image in Library and chained @ the outer win', function() {
         assert.deepStrictEqual(parse('(tech1.png@100x50)@200x100').size(library), {width:200,height:100});
+    });
+
+    it('cover image in Library and right side one is taller', function() {
+        assert.deepStrictEqual(parse('tech1.png|tech4.png').size(library), {width:400,height:160});
     });
 });
