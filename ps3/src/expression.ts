@@ -34,7 +34,6 @@ export interface MemeExpression {
      */
     equalValue(that: MemeExpression): boolean;
 
-    // TODO Problem 3.1: size operation (takes an ImageLibrary)
     /**
      * 
      * @param library an imageLibrary
