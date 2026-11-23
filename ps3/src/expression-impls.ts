@@ -4,6 +4,7 @@
 
 import assert from 'node:assert';
 import type { MemeExpression } from './expression.ts';
+import { ImageLibrary } from './imagelibrary.ts';
 
 // Problem 1.1: the concrete variants of MemeExpression go in this file,
 // one class per kind of expression (filename, caption, each operator, ...).
@@ -63,6 +64,13 @@ export class Filename implements MemeExpression {
     public toString(): string {
         return this.name;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public size(library:ImageLibrary): {width:number, height:number} {
+        return {width: library.getImage(this.name).width, height: library.getImage(this.name).height};
+    }
 }
 
 
@@ -115,6 +123,13 @@ export class Resize implements MemeExpression {
     public toString(): string {
         return '(' + this.exp.toString() + ')' + '@' + this.newWidth + 'x' + this.newHeight;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public size(library:ImageLibrary): {width:number, height:number} {
+        return {width: this.newWidth, height: this.newHeight};
+    }
 }
 
 
@@ -158,5 +173,15 @@ export class SideBySide implements MemeExpression {
      */
     public toString(): string {
         return '(' + this.left.toString() + '|' + this.right.toString() + ')';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public size(library:ImageLibrary): {width:number, height:number} {
+        const left = this.left.size(library);
+        const right = this.right.size(library);
+        return {width: left.width + right.width,
+            height: Math.max(left.height, right.height)};
     }
 }

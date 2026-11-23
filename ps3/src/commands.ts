@@ -28,7 +28,8 @@ import type { ImageLibrary } from './imagelibrary.ts';
  * @throws Error if the size cannot be computed
  */
 export function size(expression: MemeExpression, library: ImageLibrary): string {
-    throw new Error('not implemented yet'); // TODO Problem 3.2
+    const s = expression.size(library);
+    return `${s.width}x${s.height}`;
 }
 
 /**
