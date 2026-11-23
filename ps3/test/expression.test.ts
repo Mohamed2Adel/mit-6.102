@@ -176,4 +176,50 @@ describe('MemeExpression', function () {
         const expression: MemeExpression = parse('boromir.jpg');
         assert(expression.equalValue(parse('boromir.jpg')));
     });
+
+    // Testing strategy for size operation 
+    // partition on input: not in Library, in Library and only one file, nested expression with |
+    //                     nested expression with Resize operator, one file with Resize operator @.
+    // partition on output: throw, @WxH, @WxH with flooring, @WxH with ceiling. ceiling and flooring
+    //                      will be covered later when extending the design to have @Wx? or @?xH.
+    
+    it('cover image not in Library', function() {
+        assert.throws(() => parse('notExist').size(library));
+    });
+
+    it('cover image in Library and only one file', function() {
+        assert.deepStrictEqual(parse('boromir.jpg').size(library), {width:550,height:325});
+    });
+
+    it('cover image in Library and only one file include @ operator', function() {
+        assert.deepStrictEqual(parse('boromir.jpg@400x200').size(library), {width:400,height:200});
+    });
+
+    it('cover image not in Library and only one file include @ operator', function() {
+        assert.deepStrictEqual(parse('notExist.jpg@300x150').size(library), {width:300,height:150});
+    });
+
+    it('cover image in Library and nested |', function() {
+        assert.deepStrictEqual(parse('boromir.jpg|tech4.png').size(library), {width:750,height:325});
+    });
+
+    it('cover image in Library and nested | and contain resize @', function() {
+        assert.deepStrictEqual(parse('(boromir.jpg|tech4.png)@100x50').size(library), {width:100,height:50});
+    });
+
+    it('cover image in Library and nested | with both side resized', function() {
+        assert.deepStrictEqual(parse('boromir.jpg@100x50|tech4.png@100x50').size(library), {width:200,height:50});
+    });
+
+    it('cover image in Library and nested | with second operand is missing', function() {
+        assert.deepStrictEqual(parse('boromir.jpg|notExist').size(library), {width:200,height:50});
+    });
+
+    it('cover image in Library and chained |', function() {
+        assert.deepStrictEqual(parse('tech1.png|tech2.png|tech3.png').size(library), {width:600,height:150});
+    });
+
+    it('cover image in Library and chained @ the outer win', function() {
+        assert.deepStrictEqual(parse('(tech1.png@100x50)@200x100').size(library), {width:200,height:100});
+    });
 });
