@@ -4,6 +4,7 @@
 
 import assert from 'node:assert';
 import { ImageLibrary } from '../src/imagelibrary.ts';
+import { getPixel } from '../src/examples.ts';
 import { type MemeExpression, parse } from '../src/expression.ts';
 
 /**
@@ -38,7 +39,14 @@ describe('MemeExpression', function () {
     //               size of 0, non-digit size (? or decimal), illegal filename (starts with - or _,
     //               contains a space, _ attached to a filename), empty input
     //   size operation:
+    //      partition on input: not in Library, in Library and only one file, nested expression with |
+    //                          nested expression with Resize operator, one file with Resize operator @.
+    //      partition on output: throw, @WxH, @WxH with flooring, @WxH with ceiling. ceiling and flooring
+    //                      will be covered later when extending the design to have @Wx? or @?xH.
     //   image operation:
+    //      generate missing image -> throw, generate one image, generated nested image side by side. 
+    //      operation on images: @ shrink and stretch.
+    //      for generating image vertically will be covered later when extending the design.
 
     it('covers passing non integer Width or Height and throw', function () {
         assert.throws(()=>parse('picture1.jpg@100.8x50'));
@@ -177,11 +185,7 @@ describe('MemeExpression', function () {
         assert(expression.equalValue(parse('boromir.jpg')));
     });
 
-    // Testing strategy for size operation 
-    // partition on input: not in Library, in Library and only one file, nested expression with |
-    //                     nested expression with Resize operator, one file with Resize operator @.
-    // partition on output: throw, @WxH, @WxH with flooring, @WxH with ceiling. ceiling and flooring
-    //                      will be covered later when extending the design to have @Wx? or @?xH.
+    // Cover Testing strategy for size operation 
     
     it('cover image not in Library', function() {
         assert.throws(() => parse('notExist').size(library));
@@ -225,5 +229,73 @@ describe('MemeExpression', function () {
 
     it('cover image in Library and right side one is taller', function() {
         assert.deepStrictEqual(parse('tech1.png|tech4.png').size(library), {width:400,height:160});
+    });
+
+    // Cover Testing strategy for image operation.
+
+    it('cover missing image so throw', function(){
+        assert.throws(()=> parse('missing.png').image(library));
+        assert.throws(()=> parse('missing.png@100x40').image(library));
+    });
+
+    it('cover drawing one image and check for pixel', function(){
+        const canvas = parse('black.png').image(library);
+        assert.strictEqual(canvas.width, 30);
+        assert.strictEqual(canvas.height, 30);
+        const [r,g,b,alpha] = getPixel(canvas, 15, 15);
+        assert(r<50);
+        assert(g<50);
+        assert(b<50);
+        assert.deepStrictEqual(alpha, 255); // r=g=b=0, alpha=255 non transparent
+    });
+
+    it('cover drawing one image with resize stretch', function(){
+        const canvas = parse('red.jpg@100x50').image(library);
+        assert.strictEqual(canvas.width, 100);
+        assert.strictEqual(canvas.height, 50);
+        const [r,g,b,alpha] = getPixel(canvas, 15, 15);
+        assert(r>200);
+        assert(g<50);
+        assert(b<50);
+        assert.deepStrictEqual(alpha, 255); // r>200,g=b=0, alpha=255 non transparent
+    }); 
+
+    it('cover drawing one image with resize shrink', function(){
+        const canvas = parse('red.jpg@10x10').image(library);
+        assert.strictEqual(canvas.width, 10);
+        assert.strictEqual(canvas.height, 10);
+        const [r,g,b,alpha] = getPixel(canvas, 5, 5);
+        assert(r>200);
+        assert(g<50);
+        assert(b<50);
+        assert.deepStrictEqual(alpha, 255); // r>200,g=b=0, alpha=255 non transparent
+    });  
+    
+    it('cover drawing nested image with |, and the left is taller', function(){
+        const canvas = parse('red.jpg|black.png').image(library);
+        assert.strictEqual(canvas.width, 60+30);
+        assert.strictEqual(canvas.height, 40);
+        const [ , , ,alpha] = getPixel(canvas, 65,35); // this is the region under the black pic, then
+        assert.deepStrictEqual(alpha, 0); // transparent
+    });
+
+    it('cover drawing nested image with |, and the right is taller', function(){
+        const canvas = parse('black.png|red.jpg').image(library);
+        assert.strictEqual(canvas.width, 30+60);
+        assert.strictEqual(canvas.height, 40);
+        const [ , , ,alpha] = getPixel(canvas, 5,35); // this is the region under the black pic, then
+        assert.deepStrictEqual(alpha, 0); // transparent
+    });
+
+    it('cover drawing chain of 3 image using |', function(){
+        const canvas = parse('black.png|red.jpg|black.png').image(library);
+        assert.strictEqual(canvas.width, 30+60+30);
+        assert.strictEqual(canvas.height, 40);
+    });
+
+    it('cover drawing chain of 2 image with resize for each', function(){
+        const canvas = parse('black.png@100x50|red.jpg@100x50').image(library);
+        assert.strictEqual(canvas.width, 200);
+        assert.strictEqual(canvas.height, 50);
     });
 });
