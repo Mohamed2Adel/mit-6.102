@@ -4,7 +4,8 @@
 
 import assert from 'node:assert';
 import type { MemeExpression } from './expression.ts';
-import { Canvas, ImageLibrary } from './imagelibrary.ts';
+import { type Canvas, ImageLibrary, createCanvas } from './imagelibrary.ts';
+import { drawImageScaled } from './examples.ts';
 
 // Problem 1.1: the concrete variants of MemeExpression go in this file,
 // one class per kind of expression (filename, caption, each operator, ...).
@@ -76,7 +77,11 @@ export class Filename implements MemeExpression {
      * @inheritDoc
      */
     public image(library: ImageLibrary): Canvas {
-        throw new Error('not implemented yet');
+        const src = library.getImage(this.name);
+        const canvas = createCanvas(src.width, src.height); 
+        const context = canvas.getContext('2d');
+        context.drawImage(src, 0, 0);
+        return canvas;
     }
 
 }
@@ -143,7 +148,11 @@ export class Resize implements MemeExpression {
      * @inheritDoc
      */
     public image(library: ImageLibrary): Canvas {
-        throw new Error('not implemented yet');
+        const src = this.exp.image(library);
+        const canvas = createCanvas(this.newWidth, this.newHeight); 
+        const context = canvas.getContext('2d');
+        context.drawImage(src, 0, 0, this.newWidth, this.newHeight);
+        return canvas;
     }
 
 }
@@ -205,7 +214,13 @@ export class SideBySide implements MemeExpression {
      * @inheritDoc
      */
     public image(library: ImageLibrary): Canvas {
-        throw new Error('not implemented yet');
+        const left = this.left.image(library);
+        const right = this.right.image(library);
+        const canvas = createCanvas(left.width + right.width, Math.max(left.height, right.height));
+        const context = canvas.getContext('2d');
+        context.drawImage(left, 0, 0, left.width, left.height);
+        context.drawImage(right, left.width, 0, right.width, right.height);
+        return canvas;
     }
     
 }

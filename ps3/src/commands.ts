@@ -42,5 +42,5 @@ export function size(expression: MemeExpression, library: ImageLibrary): string 
  * @throws Error if the image cannot be generated
  */
 export function image(expression: MemeExpression, library: ImageLibrary): string {
-    throw new Error('not implemented yet'); // TODO Problem 4.2
+    return expression.image(library).toDataURL();
 }
