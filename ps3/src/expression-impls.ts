@@ -4,7 +4,7 @@
 
 import assert from 'node:assert';
 import type { MemeExpression } from './expression.ts';
-import { ImageLibrary } from './imagelibrary.ts';
+import { Canvas, ImageLibrary } from './imagelibrary.ts';
 
 // Problem 1.1: the concrete variants of MemeExpression go in this file,
 // one class per kind of expression (filename, caption, each operator, ...).
@@ -71,6 +71,14 @@ export class Filename implements MemeExpression {
     public size(library:ImageLibrary): {width:number, height:number} {
         return {width: library.getImage(this.name).width, height: library.getImage(this.name).height};
     }
+
+    /**
+     * @inheritDoc
+     */
+    public image(library: ImageLibrary): Canvas {
+        throw new Error('not implemented yet');
+    }
+
 }
 
 
@@ -130,6 +138,14 @@ export class Resize implements MemeExpression {
     public size(library:ImageLibrary): {width:number, height:number} {
         return {width: this.newWidth, height: this.newHeight};
     }
+
+    /**
+     * @inheritDoc
+     */
+    public image(library: ImageLibrary): Canvas {
+        throw new Error('not implemented yet');
+    }
+
 }
 
 
@@ -184,4 +200,12 @@ export class SideBySide implements MemeExpression {
         return {width: left.width + right.width,
             height: Math.max(left.height, right.height)};
     }
+
+    /**
+     * @inheritDoc
+     */
+    public image(library: ImageLibrary): Canvas {
+        throw new Error('not implemented yet');
+    }
+    
 }
