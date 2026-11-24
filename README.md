@@ -17,7 +17,7 @@ The course teaches how to write software that is **safe from bugs**, **easy to u
 | [`ps0/`](ps0/) | Turtle Graphics | TypeScript, VS Code, Mocha tests, Git | Done |
 | [`ps1/`](ps1/) | Specific Graphics | Test-first programming, weak vs. strong specs, linear interpolation, colors, Bézier curves, animations | Done |
 | [`ps2/`](ps2/) | Multi-Startup Set | ADTs, AF/RI, rep exposure, generics, two reps for one interface | Done |
-| [`ps3/`](ps3/) | Memely | Recursive data types, grammars and parsing (ParserLib), equality, Canvas images | Starter code |
+| [`ps3/`](ps3/) | Memely | Recursive data types, grammars and parsing (ParserLib), equality, Canvas images | Done, need extension for more operations |
 
 ## Running a problem set
 
